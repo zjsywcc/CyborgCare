@@ -1,0 +1,21 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <com.moecheng.cyborgcare.viewcontroller.Tabbar
+        android:id="@+id/multipager_tabbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/WHTabbarHeight"
+        android:layout_alignParentBottom="true">
+        
+    </com.moecheng.cyborgcare.viewcontroller.Tabbar>
+    
+    <com.moecheng.cyborgcare.viewcontroller.CustomViewPager
+        android:id="@+id/multipager_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/multipager_tabbar">
+        
+    </com.moecheng.cyborgcare.viewcontroller.CustomViewPager>
+    
+</RelativeLayout>
