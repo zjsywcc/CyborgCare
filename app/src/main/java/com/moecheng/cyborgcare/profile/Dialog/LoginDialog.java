@@ -14,11 +14,11 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.moecheng.cyborgcare.R;
-import com.moecheng.cyborgcare.local.User;
+import com.moecheng.cyborgcare.db.DataAccess;
+import com.moecheng.cyborgcare.db.entity.User;
 import com.moecheng.cyborgcare.network.api.BaseApi;
 import com.moecheng.cyborgcare.network.api.LoginApi;
 import com.moecheng.cyborgcare.network.api.RegisterApi;
-import com.moecheng.cyborgcare.network.bean.UserInfoBean;
 import com.moecheng.cyborgcare.network.bean.request.LoginRequest;
 import com.moecheng.cyborgcare.network.bean.request.RegisterRequest;
 import com.moecheng.cyborgcare.network.bean.response.LoginResponse;
@@ -59,7 +59,7 @@ public class LoginDialog extends Dialog implements View.OnClickListener {
 
     private OnLoginRegisterCompleteListener onLoginRegisterCompleteListener = new OnLoginRegisterCompleteListener() {
         @Override
-        public void onLoginRegisterComplete(boolean isLogin, UserInfoBean bean) {
+        public void onLoginRegisterComplete(boolean isLogin, User bean) {
 
         }
 
@@ -150,16 +150,16 @@ public class LoginDialog extends Dialog implements View.OnClickListener {
                 try {
                     Gson gson = new Gson();
                     LoginResponse.Data data = gson.fromJson(response.getData(), LoginResponse.Data.class);
-                    UserInfoBean bean = new UserInfoBean();
-                    bean.setEmail(data.getEmail());
-                    bean.setName(data.getUsername());
-                    bean.setAge(data.getAge());
-                    bean.setSex(data.getSex());
-                    bean.setToken(data.getToken());
-                    bean.setUid(data.getUid() + "");
-                    bean.setFatigue_index(data.getFatigue_index());
-                    User.syncUserInfo(bean, context);
-                    onLoginRegisterCompleteListener.onLoginRegisterComplete(true, bean);
+                    User user = DataAccess.getUser();
+                    user.setUid(data.getUid());
+                    user.setUsername(data.getUsername());
+                    user.setEmail(data.getEmail());
+                    user.setAge(data.getAge());
+                    user.setSex(data.getSex());
+                    user.setFatigueIndex(data.getFatigue_index());
+                    user.setToken(data.getToken());
+                    DataAccess.updateUser(user);
+                    onLoginRegisterCompleteListener.onLoginRegisterComplete(true, user);
                     dialog.dismiss();
                     ToastUtil.showToast(context, "登陆成功！");
                 } catch (Exception e) {
@@ -217,16 +217,16 @@ public class LoginDialog extends Dialog implements View.OnClickListener {
             public void onSuccess(RegisterResponse response) {
                 Gson gson = new Gson();
                 RegisterResponse.Data data = gson.fromJson(response.getData(), RegisterResponse.Data.class);
-                UserInfoBean bean = new UserInfoBean();
-                bean.setEmail(data.getEmail());
-                bean.setName(data.getUsername());
-                bean.setAge(data.getAge());
-                bean.setSex(data.getSex());
-                bean.setToken(data.getToken());
-                bean.setUid(data.getUid() + "");
-                bean.setFatigue_index(data.getFatigue_index());
-                User.syncUserInfo(bean, context);
-                onLoginRegisterCompleteListener.onLoginRegisterComplete(true, bean);
+                User user = DataAccess.getUser();
+                user.setUid(data.getUid());
+                user.setUsername(data.getUsername());
+                user.setEmail(data.getEmail());
+                user.setAge(data.getAge());
+                user.setSex(data.getSex());
+                user.setFatigueIndex(data.getFatigue_index());
+                user.setToken(data.getToken());
+                DataAccess.updateUser(user);
+                onLoginRegisterCompleteListener.onLoginRegisterComplete(true, user);
                 dialog.dismiss();
                 ToastUtil.showToast(context, "注册成功！");
             }
@@ -259,7 +259,7 @@ public class LoginDialog extends Dialog implements View.OnClickListener {
     }
 
     public interface OnLoginRegisterCompleteListener {
-        void onLoginRegisterComplete(boolean isLogin, UserInfoBean bean);
+        void onLoginRegisterComplete(boolean isLogin, User user);
         void onFail(boolean isLogin, int errorFlag);
     }
 }

@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+//greenDao依赖
+apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 26
@@ -17,6 +19,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    //在创建玩实体类之后make project 存放greenDao  DB 的包位置
+    greendao {
+        schemaVersion 1
+        daoPackage 'com.moecheng.cyborgcare.greendao'//这个是生成代码保存的包名
+        targetGenDir 'src/main/java'//保存到java代码路径
+    }
 }
 
 dependencies {
@@ -24,14 +33,23 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    // support lib
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'de.hdodenhof:circleimageview:2.0.0'
     compile 'com.patrickpissurno:ripple-effect:1.3.1'
+
+    //okhttp
     compile 'com.squareup.okhttp3:okhttp:3.4.2'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.google.code.gson:gson:2.6.2'
+
+    //greenDao的配置
+    compile 'org.greenrobot:greendao:3.2.2'
+    compile 'org.greenrobot:greendao-generator:3.2.2'
+
     testCompile 'junit:junit:4.12'
 }

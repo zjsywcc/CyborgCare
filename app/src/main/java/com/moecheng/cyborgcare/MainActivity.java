@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.moecheng.cyborgcare.calender.CalenderFragment;
-import com.moecheng.cyborgcare.local.User;
 import com.moecheng.cyborgcare.measure.MeasureFragment;
 import com.moecheng.cyborgcare.monitor.MonitorFragment;
 import com.moecheng.cyborgcare.profile.ProfileFragment;
@@ -24,7 +23,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        User.getInstance().initUserInfo();
     }
 
 

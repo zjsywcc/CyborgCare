@@ -15,8 +15,8 @@ import android.widget.TextView;
 import com.andexert.library.RippleView;
 import com.moecheng.cyborgcare.Configurations;
 import com.moecheng.cyborgcare.R;
-import com.moecheng.cyborgcare.local.User;
-import com.moecheng.cyborgcare.network.bean.UserInfoBean;
+import com.moecheng.cyborgcare.db.DataAccess;
+import com.moecheng.cyborgcare.db.entity.User;
 import com.moecheng.cyborgcare.profile.Dialog.LoginDialog;
 import com.moecheng.cyborgcare.util.Log;
 
@@ -80,7 +80,7 @@ public class ProfileFragment extends Fragment implements RippleView.OnRippleComp
 
     private void refreshContents() {
 
-        mUserNameTextView.setText(User.getInstance().getUserName());
+        mUserNameTextView.setText(DataAccess.getUser().getUsername());
 
         String home = getActivity().getFilesDir().getAbsolutePath();
         File avatarFile = new File(home + Configurations.AVATAR_FILE_PATH);
@@ -95,10 +95,10 @@ public class ProfileFragment extends Fragment implements RippleView.OnRippleComp
             mAvatarImageView.setImageResource(R.drawable.default_avatar);
         }
 
-        if (User.getInstance().getUid() == -1) {
+        if (DataAccess.getUser().getUid() == -1) {
             mLoginCell.setVisibility(View.VISIBLE);
         } else {
-            Log.i("uid", User.getInstance().getUid() + "");
+            Log.i("uid", DataAccess.getUser().getUid() + "");
             mLoginCell.setVisibility(View.GONE);
         }
     }
@@ -118,8 +118,8 @@ public class ProfileFragment extends Fragment implements RippleView.OnRippleComp
         LoginDialog loginDialog = new LoginDialog(getActivity(), true);
         loginDialog.setOnLoginRegisterCompleteListener(new LoginDialog.OnLoginRegisterCompleteListener() {
             @Override
-            public void onLoginRegisterComplete(boolean isLogin, UserInfoBean bean) {
-
+            public void onLoginRegisterComplete(boolean isLogin, User bean) {
+                refreshContents();
             }
 
             @Override
