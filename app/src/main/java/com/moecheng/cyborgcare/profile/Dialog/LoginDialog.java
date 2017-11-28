@@ -26,7 +26,7 @@ import com.moecheng.cyborgcare.network.bean.response.RegisterResponse;
 import com.moecheng.cyborgcare.util.DialogBuilder;
 import com.moecheng.cyborgcare.util.ToastUtil;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -36,23 +36,23 @@ import butterknife.ButterKnife;
 public class LoginDialog extends Dialog implements View.OnClickListener {
 
     private Context context;
-    @Bind(R.id.login_dialog_login_header)
+    @BindView(R.id.login_dialog_login_header)
     TextView mLoginHeader;
-    @Bind(R.id.login_dialog_register_header)
+    @BindView(R.id.login_dialog_register_header)
     TextView mRegisterHeader;
-    @Bind(R.id.login_dialog_login_header_mask)
+    @BindView(R.id.login_dialog_login_header_mask)
     View mLoginMask;
-    @Bind(R.id.login_dialog_register_header_mask)
+    @BindView(R.id.login_dialog_register_header_mask)
     View mRegisterMask;
-    @Bind(R.id.login_dialog_name_input)
+    @BindView(R.id.login_dialog_name_input)
     EditText mUserNameEdit;
-    @Bind(R.id.login_dialog_pwd_input)
+    @BindView(R.id.login_dialog_pwd_input)
     EditText mPwdEdit;
-    @Bind(R.id.login_dialog_pwd_confirm_input)
+    @BindView(R.id.login_dialog_pwd_confirm_input)
     EditText mPwdConfirmEdit;
-    @Bind(R.id.login_dialog_login_btn)
+    @BindView(R.id.login_dialog_login_btn)
     TextView mLoginButton;
-    @Bind(R.id.login_dialog_confirm_rel)
+    @BindView(R.id.login_dialog_confirm_rel)
     LinearLayout mConfirmLayout;
 
     private boolean isLogin;

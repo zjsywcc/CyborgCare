@@ -12,6 +12,11 @@
     <color name="textColorSecondary">#727272</color>
     <color name="textColorSecondaryPressed">#BFBCBC</color>
 
+    <!-- 主色 -->
+    <color name="default_main_color_shallow">#00CCE4</color>
+    <color name="default_main_color">#00BCD4</color>
+    <color name="default_main_color_deep">#009CB4</color>
+
     <!-- tabbar -->
     <color name="WHTabbarLineColor">@color/divider_color</color>
 
@@ -21,5 +26,11 @@
 
     <!-- dialog -->
     <color name="pureWindowBackground">#FFFFFF</color>
+
+    <!-- profile detail activity -->
+    <color name="red">#FFC93437</color>
+    <color name="blue">#FF375BF1</color>
+    <color name="yellow">#FFF7D23E</color>
+    <color name="green">#FF34A350</color>
 
 </resources>

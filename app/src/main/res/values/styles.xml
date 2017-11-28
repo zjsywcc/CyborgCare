@@ -15,6 +15,19 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <!-- toolbar title -->
+    <style name="ToolbarTextAppearance" parent="Base.TextAppearance.AppCompat">
+        <item name="android:textSize">@dimen/textSize_second_title</item>
+    </style>
+
+    <!-- toolbar -->
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:foreground">@color/pureWindowBackground</item>
+        <item name="android:textColorPrimary">@color/pureWindowBackground</item>
+        <item name="android:textColorTertiary">@color/pureWindowBackground</item>
+        <item name="android:textColorSecondary">@color/pureWindowBackground</item>
+    </style>
+
     <!-- toolbar主题样式 -->
     <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">
         <!-- menu中showAsAction设置为ifRoom和always的item项（即操作栏上）字体颜色 -->

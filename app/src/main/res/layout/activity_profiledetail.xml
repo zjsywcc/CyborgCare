@@ -1,0 +1,667 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbarlayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:contentScrim="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/personal_info_avatar_imageview"
+                android:layout_width="@dimen/personal_avatar_size"
+                android:layout_height="@dimen/personal_avatar_size"
+                android:layout_gravity="start"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="@dimen/personal_avatar_margin_left"
+                android:layout_marginStart="@dimen/personal_avatar_margin_left"
+                android:layout_marginTop="30dp"
+                android:contentDescription="@string/profile_avatar_imageview"
+                android:scaleType="centerCrop"
+                app:civ_border_color="@color/textColorPrimaryPressed"
+                app:civ_border_width="0dp"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.9" />
+
+            <LinearLayout
+                android:id="@+id/main.linearlayout.title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/profile_person_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="bottom|center"
+                    android:textColor="@android:color/white"
+                    android:textSize="30sp" />
+            </LinearLayout>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/collapsingtoolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin" >
+
+                <TextView
+                    android:id="@+id/tool_bar_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    />
+
+            </android.support.v7.widget.Toolbar>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:paddingBottom="@dimen/personal_padding"
+            android:paddingLeft="@dimen/personal_padding"
+            android:paddingRight="@dimen/personal_padding"
+            android:paddingTop="@dimen/personal_padding_small">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:id="@+id/personal_main_info_rel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/round_write_rectangle">
+
+                    <LinearLayout
+                        android:id="@+id/personal_main_info_linear_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp"
+                        android:baselineAligned="false"
+                        android:divider="@drawable/vertical_line"
+                        android:orientation="horizontal"
+                        android:showDividers="middle">
+
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1">
+
+                            <TextView
+                                android:id="@+id/personal_info_today_times"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:textColor="@color/textColorSecondary"
+                                android:textSize="@dimen/textSize_second_title" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/personal_info_today_times"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="5dp"
+                                android:text="@string/personal_info_today_times"
+                                android:textColor="@color/textColorSecondary"
+                                android:textSize="@dimen/textSize_normal" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1">
+
+                            <TextView
+                                android:id="@+id/personal_info_total_times"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:textColor="@color/textColorSecondary"
+                                android:textSize="@dimen/textSize_second_title" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/personal_info_total_times"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="5dp"
+                                android:text="@string/personal_info_total_times"
+                                android:textColor="@color/textColorSecondary"
+                                android:textSize="@dimen/textSize_normal" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1">
+
+                            <TextView
+                                android:id="@+id/personal_info_health_assess"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:textColor="@color/textColorSecondary"
+                                android:textSize="@dimen/textSize_second_title" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/personal_info_health_assess"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="5dp"
+                                android:text="@string/personal_info_health_assess"
+                                android:textColor="@color/textColorSecondary"
+                                android:textSize="@dimen/textSize_normal" />
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="3dp"
+                        android:layout_below="@id/personal_main_info_linear_layout">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@color/default_main_color" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@color/default_main_color_deep" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@color/default_main_color" />
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/personal_info_basic_rel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/personal_main_info_rel"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/round_write_rectangle"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="5dp">
+
+                    <RelativeLayout
+                        android:id="@+id/personal_info_uid_rel"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/personal_info_field_height">
+
+                        <ImageView
+                            android:id="@+id/personal_info_uid_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:contentDescription="@string/personal_info_uid_hint"
+                            android:scaleType="fitCenter"
+                            android:src="@mipmap/uid" />
+
+                        <TextView
+                            android:id="@+id/personal_info_uid_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_toEndOf="@id/personal_info_uid_img"
+                            android:layout_toRightOf="@id/personal_info_uid_img"
+                            android:background="#00000000"
+                            android:gravity="center_vertical"
+                            android:text="@string/personal_info_uid_hint"
+                            android:textSize="@dimen/textSize_normal" />
+
+                    </RelativeLayout>
+
+                    <View
+                        android:id="@+id/personal_line1"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/personal_info_uid_rel"
+                        android:layout_marginBottom="3dp"
+                        android:layout_marginTop="3dp"
+                        android:background="@color/divider_color_shallow" />
+
+                    <RelativeLayout
+                        android:id="@+id/personal_info_name_rel"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/personal_info_field_height"
+                        android:layout_below="@id/personal_line1">
+
+                        <ImageView
+                            android:id="@+id/personal_info_name_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:contentDescription="@string/personal_info_name_hint"
+                            android:scaleType="fitCenter"
+                            android:src="@mipmap/name" />
+
+                        <EditText
+                            android:id="@+id/personal_info_name_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_toEndOf="@id/personal_info_name_img"
+                            android:layout_toRightOf="@id/personal_info_name_img"
+                            android:background="#00000000"
+                            android:gravity="center_vertical"
+                            android:hint="@string/personal_info_name_hint"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="@dimen/textSize_normal" />
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/personal_info_other_rel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/personal_info_basic_rel"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/round_write_rectangle"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="5dp">
+
+                    <RelativeLayout
+                        android:id="@+id/personal_info_sex_rel"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/personal_info_field_height">
+
+                        <ImageView
+                            android:id="@+id/personal_info_sex_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:contentDescription="@string/personal_info_sex_hint"
+                            android:scaleType="fitCenter"
+                            android:src="@mipmap/sex" />
+
+                        <TextView
+                            android:id="@+id/personal_info_sex_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_toEndOf="@id/personal_info_sex_img"
+                            android:layout_toRightOf="@id/personal_info_sex_img"
+                            android:background="#00000000"
+                            android:gravity="center_vertical"
+                            android:hint="@string/personal_info_sex_hint"
+                            android:textSize="@dimen/textSize_normal" />
+
+                    </RelativeLayout>
+
+                    <View
+                        android:id="@+id/personal_line0"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/personal_info_sex_rel"
+                        android:layout_marginBottom="3dp"
+                        android:layout_marginTop="3dp"
+                        android:background="@color/divider_color_shallow" />
+
+                    <RelativeLayout
+                        android:id="@+id/personal_info_birth_rel"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/personal_info_field_height"
+                        android:layout_below="@id/personal_line0">
+
+                        <ImageView
+                            android:id="@+id/personal_info_birth_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:contentDescription="@string/personal_info_birth_hint"
+                            android:scaleType="fitCenter"
+                            android:src="@mipmap/cake" />
+
+                        <TextView
+                            android:id="@+id/personal_info_birth_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_toEndOf="@id/personal_info_birth_img"
+                            android:layout_toRightOf="@id/personal_info_birth_img"
+                            android:background="#00000000"
+                            android:gravity="center_vertical"
+                            android:hint="@string/personal_info_birth_hint"
+                            android:textSize="@dimen/textSize_normal" />
+
+                    </RelativeLayout>
+
+                    <View
+                        android:id="@+id/personal_line2"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/personal_info_birth_rel"
+                        android:layout_marginBottom="3dp"
+                        android:layout_marginTop="3dp"
+                        android:background="@color/divider_color_shallow" />
+
+                    <RelativeLayout
+                        android:id="@+id/personal_info_age_rel"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/personal_info_field_height"
+                        android:layout_below="@id/personal_line2">
+
+                        <ImageView
+                            android:id="@+id/personal_info_age_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:contentDescription="@string/personal_info_age_hint"
+                            android:scaleType="fitCenter"
+                            android:src="@mipmap/age" />
+
+                        <TextView
+                            android:id="@+id/personal_info_age_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_toEndOf="@id/personal_info_age_img"
+                            android:layout_toRightOf="@id/personal_info_age_img"
+                            android:background="#00000000"
+                            android:gravity="center_vertical"
+                            android:hint="@string/personal_info_age_hint"
+                            android:textSize="@dimen/textSize_normal" />
+
+                    </RelativeLayout>
+
+                    <View
+                        android:id="@+id/personal_line3"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/personal_info_age_rel"
+                        android:layout_marginBottom="3dp"
+                        android:layout_marginTop="3dp"
+                        android:background="@color/divider_color_shallow" />
+
+                    <RelativeLayout
+                        android:id="@+id/personal_info_constellation_rel"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/personal_info_field_height"
+                        android:layout_below="@id/personal_line3">
+
+                        <ImageView
+                            android:id="@+id/personal_info_constellation_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:contentDescription="@string/personal_info_constellation_hint"
+                            android:scaleType="fitCenter"
+                            android:src="@mipmap/constellation" />
+
+                        <TextView
+                            android:id="@+id/personal_info_constellation_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_toEndOf="@id/personal_info_constellation_img"
+                            android:layout_toRightOf="@id/personal_info_constellation_img"
+                            android:background="#00000000"
+                            android:gravity="center_vertical"
+                            android:hint="@string/personal_info_constellation_hint"
+                            android:textSize="@dimen/textSize_normal" />
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/personal_info_contact_rel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/personal_info_other_rel"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/round_write_rectangle"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="5dp">
+
+                    <RelativeLayout
+                        android:id="@+id/personal_info_email_rel"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/personal_info_field_height">
+
+                        <ImageView
+                            android:id="@+id/personal_info_email_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:contentDescription="@string/personal_info_email_hint"
+                            android:scaleType="fitCenter"
+                            android:src="@mipmap/email" />
+
+                        <EditText
+                            android:id="@+id/personal_email_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="11dp"
+                            android:layout_toEndOf="@id/personal_info_email_img"
+                            android:layout_toRightOf="@id/personal_info_email_img"
+                            android:background="#00000000"
+                            android:gravity="center_vertical"
+                            android:hint="@string/personal_info_email_hint"
+                            android:inputType="textEmailAddress"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="@dimen/textSize_normal" />
+
+                    </RelativeLayout>
+
+                    <View
+                        android:id="@+id/personal_line4"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/personal_info_email_rel"
+                        android:layout_marginBottom="3dp"
+                        android:layout_marginTop="3dp"
+                        android:background="@color/divider_color_shallow" />
+
+                    <RelativeLayout
+                        android:id="@+id/personal_info_location_rel"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/personal_info_field_height"
+                        android:layout_below="@id/personal_line4">
+
+                        <ImageView
+                            android:id="@+id/personal_info_location_img"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:contentDescription="@string/personal_info_location_hint"
+                            android:scaleType="fitCenter"
+                            android:src="@mipmap/location" />
+
+                        <EditText
+                            android:id="@+id/personal_info_location_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_toEndOf="@id/personal_info_location_img"
+                            android:layout_toRightOf="@id/personal_info_location_img"
+                            android:background="#00000000"
+                            android:gravity="center_vertical"
+                            android:hint="@string/personal_info_location_hint"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="@dimen/textSize_normal" />
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/personal_info_intro_rel"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/personal_info_intro_height"
+                    android:layout_below="@id/personal_info_contact_rel"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/round_write_rectangle"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="5dp">
+
+                    <ImageView
+                        android:id="@+id/personal_info_intro_img"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/personal_info_field_height"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:contentDescription="@string/personal_info_intro_hint"
+                        android:scaleType="fitCenter"
+                        android:src="@mipmap/signature" />
+
+                    <EditText
+                        android:id="@+id/personal_info_intro_edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="11dp"
+                        android:layout_toEndOf="@id/personal_info_intro_img"
+                        android:layout_toRightOf="@id/personal_info_intro_img"
+                        android:background="#00000000"
+                        android:gravity="top"
+                        android:hint="@string/personal_info_intro_hint"
+                        android:textColor="@color/textColorSecondary"
+                        android:textSize="@dimen/textSize_normal" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/personal_info_logout_rel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/personal_info_intro_rel"
+                    android:layout_marginTop="8dp"
+                    android:paddingBottom="5dp">
+
+                    <com.andexert.library.RippleView
+                        android:id="@+id/personal_change_pwd_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:rv_color="@color/onTouchColor"
+                        app:rv_framerate="24"
+                        app:rv_rippleDuration="80">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/personal_logout_button_height"
+                            android:gravity="center"
+                            android:text="@string/personal_update_profile"
+                            android:textSize="@dimen/textSize_second_title" />
+
+                    </com.andexert.library.RippleView>
+
+                    <View
+                        android:id="@+id/personal_line5"
+                        android:layout_width="200dp"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/personal_change_pwd_tv"
+                        android:layout_centerHorizontal="true"
+                        android:background="@color/divider_color" />
+
+                    <com.andexert.library.RippleView
+                        android:id="@+id/personal_logout_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/personal_line5"
+                        app:rv_color="@color/onTouchColor"
+                        app:rv_framerate="24"
+                        app:rv_rippleDuration="80">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/personal_logout_button_height"
+                            android:gravity="center"
+                            android:text="@string/personal_logout"
+                            android:textColor="@color/red"
+                            android:textSize="@dimen/textSize_second_title" />
+
+                    </com.andexert.library.RippleView>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/personal_click_mask"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </FrameLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+
+
+</android.support.design.widget.CoordinatorLayout>

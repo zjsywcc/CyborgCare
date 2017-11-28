@@ -17,15 +17,20 @@ import com.moecheng.cyborgcare.Configurations;
 import com.moecheng.cyborgcare.R;
 import com.moecheng.cyborgcare.db.DataAccess;
 import com.moecheng.cyborgcare.db.entity.User;
+import com.moecheng.cyborgcare.event.Event;
 import com.moecheng.cyborgcare.profile.Dialog.LoginDialog;
 import com.moecheng.cyborgcare.util.Log;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -37,31 +42,33 @@ public class ProfileFragment extends Fragment implements RippleView.OnRippleComp
     private final int REQUEST_PERSONAL_ACTIVITY = 0x31;
 
 
-    @Bind(R.id.profile_person_rel)
+    @BindView(R.id.profile_person_rel)
     RippleView mPersonCell;
-    @Bind(R.id.profile_notify_rel)
+    @BindView(R.id.profile_personal_indicator)
+    ImageView mPersonNext;
+    @BindView(R.id.profile_notify_rel)
     RippleView mNotifyCell;
-    @Bind(R.id.profile_upload_rel)
+    @BindView(R.id.profile_upload_rel)
     RippleView mSyncCell;
-    @Bind(R.id.profile_reset_rel)
+    @BindView(R.id.profile_reset_rel)
     RippleView mResetCell;
-    @Bind(R.id.profile_login_rel)
+    @BindView(R.id.profile_login_rel)
     RippleView mLoginCell;
-    @Bind(R.id.profile_server_connection_rel)
+    @BindView(R.id.profile_server_connection_rel)
     RippleView mServerConnectionCell;
-    @Bind(R.id.profile_bluetooth_connection_rel)
+    @BindView(R.id.profile_bluetooth_connection_rel)
     RippleView mBluetoothConnectionCell;
-    @Bind(R.id.profile_monitor_gap_rel)
+    @BindView(R.id.profile_monitor_gap_rel)
     RippleView mMonitorSpeedCell;
-    @Bind(R.id.profile_avatar_imageview)
+    @BindView(R.id.profile_avatar_imageview)
     ImageView mAvatarImageView;
-    @Bind(R.id.profile_person_name)
+    @BindView(R.id.profile_person_name)
     TextView mUserNameTextView;
-    @Bind(R.id.profile_server_connection_textview)
+    @BindView(R.id.profile_server_connection_textview)
     TextView mServerConnectionTextView;
-    @Bind(R.id.profile_bluetooth_connection_textview)
+    @BindView(R.id.profile_bluetooth_connection_textview)
     TextView mBluetoothConnectionTextView;
-    @Bind(R.id.profile_monitor_gap_textview)
+    @BindView(R.id.profile_monitor_gap_textview)
     TextView mMonitorSpeedTextView;
 
     @Nullable
@@ -71,17 +78,31 @@ public class ProfileFragment extends Fragment implements RippleView.OnRippleComp
         ButterKnife.bind(this, rootView);
         initView(rootView);
         refreshContents();
+        EventBus.getDefault().register(this);
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroyView();
+    }
+
+    // This method will be called when a SomeOtherEvent is posted
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void logoutCallback(Event event) {
+        if(event.eventInfo.equals("logout")) {
+            refreshContents();
+        }
     }
 
     private void initView(View view) {
         mLoginCell.setOnRippleCompleteListener(this);
+        mPersonCell.setOnRippleCompleteListener(this);
+        mPersonCell.setEnabled(false);
     }
 
     private void refreshContents() {
-
-        mUserNameTextView.setText(DataAccess.getUser().getUsername());
-
         String home = getActivity().getFilesDir().getAbsolutePath();
         File avatarFile = new File(home + Configurations.AVATAR_FILE_PATH);
         if (avatarFile.exists()) {
@@ -94,12 +115,20 @@ public class ProfileFragment extends Fragment implements RippleView.OnRippleComp
         } else {
             mAvatarImageView.setImageResource(R.drawable.default_avatar);
         }
-
         if (DataAccess.getUser().getUid() == -1) {
+            mUserNameTextView.setText("请登录");
+            // 隐藏next图标
+            mPersonNext.setVisibility(View.INVISIBLE);
+            // 显示登录按钮
             mLoginCell.setVisibility(View.VISIBLE);
+            // 无效点击
+            mPersonCell.setEnabled(false);
         } else {
             Log.i("uid", DataAccess.getUser().getUid() + "");
+            mUserNameTextView.setText(DataAccess.getUser().getUsername());
+            mPersonNext.setVisibility(View.VISIBLE);
             mLoginCell.setVisibility(View.GONE);
+            mPersonCell.setEnabled(true);
         }
     }
 
@@ -109,7 +138,9 @@ public class ProfileFragment extends Fragment implements RippleView.OnRippleComp
 
             login();
 
-        } else {
+        } else if (mPersonCell.equals(rippleView)) {
+
+            jumpToDetail();
 
         }
     }
@@ -128,6 +159,12 @@ public class ProfileFragment extends Fragment implements RippleView.OnRippleComp
             }
         });
         loginDialog.show();
+    }
+
+    private void jumpToDetail() {
+        Intent intent = new Intent();
+        intent.setClass(getActivity(), ProfileDetailActivity.class);
+        startActivityForResult(intent, REQUEST_PERSONAL_ACTIVITY);
     }
 
     @Override

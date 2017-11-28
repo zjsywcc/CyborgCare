@@ -9,9 +9,10 @@ import com.moecheng.cyborgcare.calender.CalenderFragment;
 import com.moecheng.cyborgcare.measure.MeasureFragment;
 import com.moecheng.cyborgcare.monitor.MonitorFragment;
 import com.moecheng.cyborgcare.profile.ProfileFragment;
-import com.moecheng.cyborgcare.statusbar.StatusBarManager;
 import com.moecheng.cyborgcare.ui.BaseActivity;
 import com.moecheng.cyborgcare.viewcontroller.TabViewController;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 
@@ -66,12 +67,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void initViews() {
+        super.initViews();
         setToolbarTitleTv(R.string.app_name);
-        setTitleBgColor(R.color.colorPrimary);
-        new StatusBarManager.builder(this)
-                .setStatusBarColor(R.color.colorPrimary)//状态栏颜色
-                .setTintType(StatusBarManager.TintType.PURECOLOR)
-                .setAlpha(0)//不透明度
-                .create();
     }
 }

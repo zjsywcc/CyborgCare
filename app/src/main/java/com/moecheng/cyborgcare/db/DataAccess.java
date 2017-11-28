@@ -2,6 +2,7 @@ package com.moecheng.cyborgcare.db;
 
 
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 
 import com.moecheng.cyborgcare.AppContext;
 import com.moecheng.cyborgcare.db.entity.User;
@@ -44,5 +45,6 @@ public class DataAccess {
         List<User> userList = query.list();
         return userList.get(0);
     }
+
 
 }

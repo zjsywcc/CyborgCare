@@ -26,6 +26,36 @@
     <string name="profile_title">设置</string>
     <string name="profile_login">登陆&#160;|&#160;注册</string>
 
+    <!-- profile detail activity -->
+    <string name="personal_title">个人资料</string>
+    <string name="zero">0</string>
+    <string name="personal_info_today_times">今日测量次数</string>
+    <string name="personal_info_total_times">历史测量次数</string>
+    <string name="personal_info_health_assess">综合健康评分</string>
+    <string name="personal_info_uid_hint">uid</string>
+    <string name="personal_info_name_hint">姓名</string>
+    <string name="personal_info_sex_hint">性别</string>
+    <string name="personal_info_birth_hint">生日</string>
+    <string name="personal_info_age_hint">年龄</string>
+    <string name="personal_info_constellation_hint">星座</string>
+    <string name="personal_info_intro_hint">介绍</string>
+    <string name="personal_info_email_hint">邮件地址</string>
+    <string name="personal_info_location_hint">住址</string>
+    <string name="personal_save">保存</string>
+    <string name="personal_logout">注销账号</string>
+    <string name="personal_update_profile">更新个人信息</string>
+    <string name="personal_reset_message">清空本地缓存将会将本地的所有个人测量数据清空，但是服务器上的数据会保留。是否确定重置数据？</string>
+    <string name="personal_sex_male">男</string>
+    <string name="personal_sex_female">女</string>
+    <string name="personal_sex_alien">外星人</string>
+    <string name="personal_logout_tips">登出账号将会清空本地所有记录（包括临时账号的记录），该账号的云端记录没有影响。是否确定登出账号？</string>
+    <string name="personal_upload_fail_message">上传失败</string>
+    <string name="personal_upload_success_message">上传成功</string>
+    <string name="personal_upload_ing_message">正在上传，请稍等~</string>
+    <string name="personal_refresh_success_message">刷新成功~</string>
+    <string name="personal_refresh_fail_message">刷新失败/(ㄒoㄒ)/~~</string>
+    <string name="personal_refresh_ing_message">正在跟服务器MM索要您的最新信息，请稍候啦~</string>
+
 
     <!-- login/register dialog -->
     <string name="login_dialog_header_login">登陆</string>
