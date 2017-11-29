@@ -49,4 +49,8 @@
     <!-- dialog -->
     <dimen name="l_dialog_content">4dp</dimen>
     <dimen name="p_dialog_content_bottom">8dp</dimen>
+
+    <!-- measure activity -->
+    <dimen name="measure_chart_height">200dp</dimen>
+
 </resources>

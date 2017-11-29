@@ -71,6 +71,8 @@ public class ProfileFragment extends Fragment implements RippleView.OnRippleComp
     @BindView(R.id.profile_monitor_gap_textview)
     TextView mMonitorSpeedTextView;
 
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -100,6 +102,7 @@ public class ProfileFragment extends Fragment implements RippleView.OnRippleComp
         mLoginCell.setOnRippleCompleteListener(this);
         mPersonCell.setOnRippleCompleteListener(this);
         mPersonCell.setEnabled(false);
+        mBluetoothConnectionCell.setOnRippleCompleteListener(this);
     }
 
     private void refreshContents() {
@@ -142,6 +145,10 @@ public class ProfileFragment extends Fragment implements RippleView.OnRippleComp
 
             jumpToDetail();
 
+        } else if(mBluetoothConnectionCell.equals(rippleView)) {
+
+            openBluetoothDeviceList();
+
         }
     }
 
@@ -167,6 +174,12 @@ public class ProfileFragment extends Fragment implements RippleView.OnRippleComp
         startActivityForResult(intent, REQUEST_PERSONAL_ACTIVITY);
     }
 
+    private void openBluetoothDeviceList() {
+        Intent intent = new Intent();
+        intent.setClass(getActivity(), BluetoothControlActivity.class);
+        startActivityForResult(intent, REQUEST_PERSONAL_ACTIVITY);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_PERSONAL_ACTIVITY) {
@@ -175,6 +188,8 @@ public class ProfileFragment extends Fragment implements RippleView.OnRippleComp
             }
         }
     }
+
+
 
 
 }

@@ -33,4 +33,20 @@
     <color name="yellow">#FFF7D23E</color>
     <color name="green">#FF34A350</color>
 
+    <!-- chart -->
+    <color name="chart_line">#B6B6B6</color>
+    <color name="chart_grid">#F6F7F7</color>
+    <color name="chart_gray">#E8E8E8</color>
+    <color name="chart_tab_gray">#EFEFF4</color>
+
+    <color name="night_chart_line">#E6E6E6</color>
+    <color name="night_chart_grid1">#A6A7A7</color>
+    <color name="night_chart_grid2">#B6B7B7</color>
+    <color name="night_chart_gray">#6D6D6D</color>
+    <color name="night_chart_tab_gray">#EFEFF4</color>
+
+    <color name="chart_cyan">#00BCD4</color>
+    <color name="chart_green">#8BC34A</color>
+    <color name="chart_amber">#FFC107</color>
+
 </resources>

@@ -47,9 +47,17 @@
 
     <!-- toolbar弹出菜单样式 -->
     <style name="ToolbarPopupTheme" parent="@style/ThemeOverlay.AppCompat">
-        <item name="android:colorBackground">#ffffaa</item>
-        <item name="android:textColor">#fa4081</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:colorBackground">@color/pureWindowBackground</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textSize">14sp</item>
     </style>
+
+    <!-- bluetooth activity dialog 样式-->
+    <style name="DialogTheme" parent="@android:style/Theme.Holo.Dialog">
+        <item name="android:windowTitleBackgroundStyle">@color/colorPrimaryDark</item>
+        <item name="android:background">@android:color/white</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
 
 </resources>

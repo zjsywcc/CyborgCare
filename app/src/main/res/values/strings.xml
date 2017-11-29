@@ -69,6 +69,55 @@
     <!-- alert dialog -->
     <string name="tips">提示</string>
     <string name="ok">确定</string>
+    <string name="no_bt_support">你的设备不支持蓝牙</string>
+
+
+    <!-- bluetooth activity -->
+    <string name="search_message">搜索蓝牙设备…</string>
+    <string name="title_paired_devices">已匹配</string>
+    <string name="title_other_devices">其他设备</string>
+    <string name="none_paired">无匹配设备</string>
+    <string name="none_found">未找到</string>
+    <string name="select_device">选择蓝牙设备</string>
+    <string name="empty_device_name">&lt;新设备&gt;</string>
+    <string name="command_hint">输入指令</string>
+    <string name="button_send">发送</string>
+
+    <string name="msg_not_connected">未连接</string>
+    <string name="msg_connecting">正在连接…</string>
+    <string name="msg_connected">已连接</string>
+
+    <string name="action_bluetooth">打开/关闭</string>
+    <string name="menu_clear">清除历史记录</string>
+    <string name="menu_send">发送日志…</string>
+    <string name="menu_settings">设置</string>
+    <string name="bluetooth_title">蓝牙连接</string>
+
+    <!-- prefence keys, no translation needed -->
+    <string name="pref_commands_mode">pref_commands_mode</string>
+    <string name="pref_checksum_mode">pref_checksum_mode</string>
+    <string name="pref_commands_ending">pref_commands_ending</string>
+    <string name="pref_log_timing">pref_log_timing</string>
+    <string name="pref_log_direction">pref_log_direction</string>
+    <string name="pref_need_clean">pref_need_clean</string>
+
+    <!-- BluetoothSettingActivity -->
+    <string name="log_settings_category">命令历史:</string>
+
+    <string name="log_time">时间</string>
+    <string name="log_time_summary">在log中显示时间</string>
+    <string name="log_direction">日志方向</string>
+    <string name="log_direction_summary">在log中显示io</string>
+
+    <string name="commands_mode">输入模式:</string>
+    <string name="checksum_mode">校验值</string>
+    <string name="checksum_mode_summary">在命令中加入校验值</string>
+    <string name="commands_mode_summary">选择输入模式</string>
+    <string name="commands_ending_summary">选择终止符</string>
+
+    <string name="need_clean">清除之前的命令</string>
+    <string name="need_clean_summary">每当发送后清除命令</string>
+
 
 
 </resources>

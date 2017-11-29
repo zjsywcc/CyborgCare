@@ -7,6 +7,9 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -36,6 +39,16 @@ public class Compat {
             return context.getResources().getColor(id,null);
         } else {
             return context.getResources().getColor(id);
+        }
+    }
+
+    public static void drawRoundRect(float left, float top, float right, float bottom, float rx, float ry, Canvas canvas, Paint paint) {
+        if (VERSION >= Build.VERSION_CODES.M) {
+            canvas.drawRoundRect(left,top,right,bottom,rx,ry,paint);
+        } else {
+            RectF rect;
+            rect = new RectF(left, top, right, bottom);
+            canvas.drawRoundRect(rect, 10, 10, paint);
         }
     }
 

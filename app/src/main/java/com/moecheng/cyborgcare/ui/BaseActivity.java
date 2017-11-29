@@ -178,11 +178,32 @@ public abstract class BaseActivity extends AppCompatActivity {
 
 
     /**
+     * 为toolbar设置menu项
+     */
+    private void setInflateMenu() {
+        if (getMenuLayoutId() > 0)
+            toolbar.inflateMenu(getMenuLayoutId());
+    }
+
+    /**
+     * 获取菜单资源id，默认无，子类可重写
+     *
+     * @return
+     */
+    protected int getMenuLayoutId() {
+        return 0;
+    }
+
+
+    /**
      * 获取布局View
      *
      * @return
      */
     protected abstract View getContentView();
+
+
+
 
     /**
      * 控件初始化操作
@@ -191,6 +212,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     public void initViews() {
         toolbar = ButterKnife.findById(this, R.id.tool_bar);
+        setInflateMenu();
         Log.i("toolbar ", (toolbar.getVisibility() == View.VISIBLE) + "");
         setTitleBgColor(R.color.colorPrimary);
         new StatusBarManager.builder(this)
