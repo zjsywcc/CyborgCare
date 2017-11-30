@@ -6,27 +6,26 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
+import android.support.v4.app.LoaderManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.moecheng.cyborgcare.R;
-import com.moecheng.cyborgcare.bluetooth.DeviceConnector;
-import com.moecheng.cyborgcare.bluetooth.format.Utils;
-import com.moecheng.cyborgcare.profile.BluetoothControlActivity;
+import com.moecheng.cyborgcare.network.api.BaseApi;
+import com.moecheng.cyborgcare.network.api.UploadApi;
+import com.moecheng.cyborgcare.network.bean.request.UploadRequest;
+import com.moecheng.cyborgcare.network.bean.response.UploadResponse;
 import com.moecheng.cyborgcare.util.Log;
 import com.moecheng.cyborgcare.view.chart.Chart;
 import com.moecheng.cyborgcare.view.chart.ShadowLineChart;
 import com.moecheng.cyborgcare.view.chart.provider.LineChartAdapter;
 import com.moecheng.cyborgcare.view.chart.provider.SimpleChartAdapter;
-import com.orhanobut.logger.DiskLogAdapter;
-import com.orhanobut.logger.Logger;
 
-import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,6 +53,8 @@ public class MeasureFragment extends Fragment {
 
     public static final int MESSAGE_READ = 2;
     private static BluetoothResponseHandler mHandler;
+
+    private UploadThread uploadThread;
 
 
     @Nullable
@@ -207,6 +208,48 @@ public class MeasureFragment extends Fragment {
                     break;
 
             }
+        }
+    }
+
+    public class UploadThread extends Thread {
+
+
+        private Queue<UploadRequest.ValuePair> queue;
+
+        public UploadThread(Queue<UploadRequest.ValuePair> queue) {
+            this.queue = queue;
+        }
+
+        @Override
+        public void run() {
+            int count = 0;
+            List<UploadRequest.ValuePair> valuePairs = new ArrayList<>(120);
+            while(!queue.isEmpty()) {
+                UploadRequest.ValuePair valuePair = queue.poll();
+                count++;
+                valuePairs.add(valuePair);
+                if (count % 120 == 0) {
+                    UploadRequest request = new UploadRequest();
+                    request.setAction("upload");
+                    request.setAndroid_version(android.os.Build.VERSION.RELEASE);
+                    request.setDevice(android.os.Build.MODEL);
+                    request.setValuePairs(valuePairs);
+                    UploadApi uploadApi = new UploadApi();
+                    uploadApi.getResponse(request, new BaseApi.Handler<UploadResponse>() {
+                        @Override
+                        public void onSuccess(UploadResponse response) {
+                            Log.i("uploadAction", "上传成功");
+                        }
+
+                        @Override
+                        public void onFailure(UploadResponse response, int errorFlag) {
+                            Log.i("uploadAction", "上传失败");
+                        }
+                    }, getActivity());
+                    valuePairs = new ArrayList<>(120);
+                }
+            }
+
         }
     }
     // ==========================================================================
