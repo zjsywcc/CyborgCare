@@ -328,12 +328,14 @@ public class DeviceConnector {
                     bytes = mmInStream.read(buffer);
                     String readed = new String(buffer, 0, bytes);
                     readMessage.append(readed);
-
+                    byte[] getByteArray = new byte[bytes];
+                    System.arraycopy(buffer, 0, getByteArray, 0, bytes);
                     // 命令标记的结尾 - 将响应返回给主线程
-                    if (readed.contains("\n")) {
-                        mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
+//                    if (readed.contains("\n")) {
+//                        mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
+                        mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, bytes, -1, getByteArray).sendToTarget();
                         readMessage.setLength(0);
-                    }
+//                    }
 
                 } catch (IOException e) {
                     if (D) Log.e(TAG, "disconnected", e);

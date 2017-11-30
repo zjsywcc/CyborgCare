@@ -58,5 +58,8 @@ dependencies {
     //eventbus
     compile 'org.greenrobot:eventbus:3.0.0'
 
+    //logger日志
+    compile 'com.orhanobut:logger:2.1.1'
+
     testCompile 'junit:junit:4.12'
 }

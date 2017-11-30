@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.Layout;
 import android.text.method.ScrollingMovementMethod;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -27,8 +28,8 @@ import com.moecheng.cyborgcare.R;
 import com.moecheng.cyborgcare.bluetooth.DeviceConnector;
 import com.moecheng.cyborgcare.bluetooth.DeviceData;
 import com.moecheng.cyborgcare.bluetooth.format.Utils;
+import com.moecheng.cyborgcare.measure.MeasureFragment;
 import com.moecheng.cyborgcare.ui.BaseActivity;
-import com.moecheng.cyborgcare.util.DialogBuilder;
 import com.moecheng.cyborgcare.util.Log;
 
 import java.lang.ref.WeakReference;
@@ -37,11 +38,7 @@ import java.util.Date;
 
 import butterknife.BindView;
 
-import static com.moecheng.cyborgcare.profile.BluetoothActivity.MESSAGE_DEVICE_NAME;
-import static com.moecheng.cyborgcare.profile.BluetoothActivity.MESSAGE_READ;
-import static com.moecheng.cyborgcare.profile.BluetoothActivity.MESSAGE_STATE_CHANGE;
-import static com.moecheng.cyborgcare.profile.BluetoothActivity.MESSAGE_TOAST;
-import static com.moecheng.cyborgcare.profile.BluetoothActivity.MESSAGE_WRITE;
+
 
 /**
  * Created by wangchengcheng on 2017/11/29.
@@ -58,22 +55,22 @@ public class BluetoothControlActivity extends BaseActivity {
 
     private static final SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss.SSS");
 
+
     private static String MSG_NOT_CONNECTED;
     private static String MSG_CONNECTING;
     private static String MSG_CONNECTED;
 
-    // Intent request codes
-    static final int REQUEST_CONNECT_DEVICE = 1;
-    static final int REQUEST_ENABLE_BT = 2;
+    private static DeviceConnector connector;
+    private static MeasureFragment.BluetoothResponseHandler mHandler;
+
+
 
     // do not resend request to enable Bluetooth
     // if there is a request already in progress
     // See: https://code.google.com/p/android/issues/detail?id=24931#c1
     boolean pendingRequestEnableBt = false;
 
-    private static DeviceConnector connector;
-    private static BluetoothResponseHandler mHandler;
-    private BluetoothAdapter btAdapter;
+
 
 
     private StringBuilder logHtml;
@@ -89,19 +86,12 @@ public class BluetoothControlActivity extends BaseActivity {
     private String command_ending;
     private String deviceName;
 
+    private Bundle outState;
+
     @Override
     public void initViews() {
         super.initViews();
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (btAdapter == null) {
-            final String no_bluetooth = getString(R.string.no_bt_support);
-            new DialogBuilder(this).create()
-                    .setTitle(R.string.tips)
-                    .setContent(no_bluetooth)
-                    .setPositive(R.string.ok)
-                    .show();
-            Utils.log(no_bluetooth);
-        }
+
         this.logHtml = new StringBuilder();
         this.logTextView.setMovementMethod(new ScrollingMovementMethod());
         this.logTextView.setText(Html.fromHtml(logHtml.toString()));
@@ -149,10 +139,13 @@ public class BluetoothControlActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        outState = savedInstanceState;
         PreferenceManager.setDefaultValues(this, R.xml.activity_bluetoothsetting, false);
 
-        if (mHandler == null) mHandler = new BluetoothResponseHandler(this);
-        else mHandler.setTarget(this);
+//        if (mHandler == null) mHandler = new BluetoothResponseHandler(this);
+//        else mHandler.setTarget(this);
+
+        if (mHandler == null) mHandler = new MeasureFragment.BluetoothResponseHandler(MeasureFragment.mECGDataArrayList, MeasureFragment.mECGDataAdapter);
 
         if (isConnected() && (savedInstanceState != null)) {
             setDeviceName(savedInstanceState.getString(DEVICE_NAME));
@@ -168,6 +161,7 @@ public class BluetoothControlActivity extends BaseActivity {
     // ==========================================================================
 
 
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -176,6 +170,8 @@ public class BluetoothControlActivity extends BaseActivity {
             outState.putString(LOG, logHtml.toString());
         }
     }
+
+
     // ============================================================================
 
 
@@ -199,7 +195,7 @@ public class BluetoothControlActivity extends BaseActivity {
     }
     // ==========================================================================
 
-    private void setDeviceName(String deviceName) {
+    public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
         getToolbar().setSubtitle(deviceName);
     }
@@ -424,7 +420,7 @@ public class BluetoothControlActivity extends BaseActivity {
      * @param message  - 文字显示
      * @param outgoing - 方向
      */
-    private void appendLog(String message, boolean hexMode, boolean outgoing, boolean clean) {
+    public void appendLog(String message, boolean hexMode, boolean outgoing, boolean clean) {
 
         StringBuilder msg = new StringBuilder();
         if (show_timings) msg.append("[").append(timeformat.format(new Date())).append("]");
@@ -456,12 +452,14 @@ public class BluetoothControlActivity extends BaseActivity {
 
         logHtml.append(msg);
         logTextView.append(Html.fromHtml(msg.toString()));
+        Layout logLayout = logTextView.getLayout();
 
-        final int scrollAmount = logTextView.getLayout().getLineTop(logTextView.getLineCount()) - logTextView.getHeight();
-        if (scrollAmount > 0)
-            logTextView.scrollTo(0, scrollAmount);
-        else logTextView.scrollTo(0, 0);
-
+        if (logLayout != null) {
+            final int scrollAmount = logLayout.getLineTop(logTextView.getLineCount()) - logTextView.getHeight();
+            if (scrollAmount > 0)
+                logTextView.scrollTo(0, scrollAmount);
+            else logTextView.scrollTo(0, 0);
+        }
         if (clean) commandEditText.setText("");
     }
     // =========================================================================
@@ -469,7 +467,7 @@ public class BluetoothControlActivity extends BaseActivity {
     /**
      * 用于从蓝牙流接收数据的处理器
      */
-    private static class BluetoothResponseHandler extends Handler {
+    protected class BluetoothResponseHandler extends Handler {
         private WeakReference<BluetoothControlActivity> mActivity;
 
         public BluetoothResponseHandler(BluetoothControlActivity activity) {

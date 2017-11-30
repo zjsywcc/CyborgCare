@@ -13,6 +13,7 @@
     <!-- toolbar标题字体样式 -->
     <style name="ToolbarTitleStyle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
     </style>
 
     <!-- toolbar title -->
@@ -35,7 +36,7 @@
         <!-- menu中showAsAction设置为ifRoom和always的item项（即操作栏上）字体大小 -->
         <item name="actionMenuTextAppearance">@style/ToolbarMenuTextSize</item>
         <!-- 设置标题、menu中所有item字体颜色 -->
-        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
         <!-- 设置子标题字体颜色 -->
         <!--<item name="android:textColorSecondary">#ffad56</item>-->
     </style>

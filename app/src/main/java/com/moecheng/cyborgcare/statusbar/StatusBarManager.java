@@ -2,6 +2,8 @@ package com.moecheng.cyborgcare.statusbar;
 
 import android.app.Activity;
 import android.os.Build;
+import android.support.annotation.RequiresApi;
+import android.view.View;
 import android.view.WindowManager;
 
 import com.moecheng.cyborgcare.util.Compat;
@@ -36,6 +38,9 @@ public class StatusBarManager {
         this.mAlpha = alpha;
         this.mStatusBarColor = Compat.getColor(mActivity, statusBarColor);
         windowConfig();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            setSystemBarTheme(activity, false);
+        }
     }
 
     /**
@@ -59,6 +64,14 @@ public class StatusBarManager {
             mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             addStatusBarView(mActivity, Compat.calculateColorWithAlpha(mStatusBarColor, mAlpha));
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private static void setSystemBarTheme(final Activity pActivity, final boolean pIsDark) {
+        // Fetch the current flags.
+        final int lFlags = pActivity.getWindow().getDecorView().getSystemUiVisibility();
+        // Update the SystemUiVisibility dependening on whether we want a Light or Dark theme.
+        pActivity.getWindow().getDecorView().setSystemUiVisibility(pIsDark ? (lFlags & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR) : (lFlags | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
     }
 
     /**

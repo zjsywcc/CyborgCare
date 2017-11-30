@@ -17,6 +17,7 @@ public class AppContext extends Application {
     private static AppContext instance;
     private static Preference preference;
 
+
     @Override
     public void onCreate() {
         super.onCreate();

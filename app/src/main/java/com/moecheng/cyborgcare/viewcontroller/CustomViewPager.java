@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
 
 /**
  * Created by wangchengcheng on 2017/11/20.
@@ -62,6 +63,14 @@ public class CustomViewPager extends ViewPager {
      */
     public void setCancellable(boolean isCancellable) {
         this.isCancellable = isCancellable;
+    }
+
+    /**
+     * 去掉ScrollView、GrdiView、ListView、ViewPager等滑动到边缘的光晕效果
+     * https://zmywly8866.github.io/2014/12/16/android-remove-scroll-edge-halo.html
+     */
+    public void disableOverScroll() {
+        this.setOverScrollMode(View.OVER_SCROLL_NEVER);
     }
 
     public boolean isScrollable() {

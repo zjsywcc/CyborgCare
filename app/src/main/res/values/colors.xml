@@ -27,6 +27,10 @@
     <!-- dialog -->
     <color name="pureWindowBackground">#FFFFFF</color>
 
+    <!-- toolbar color -->
+    <color name="white">#FFFFFF</color>
+
+
     <!-- profile detail activity -->
     <color name="red">#FFC93437</color>
     <color name="blue">#FF375BF1</color>

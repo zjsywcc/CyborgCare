@@ -55,7 +55,7 @@ public class ProfileDetailActivity extends BaseActivity implements RippleView.On
 
         hideToolbar();
         new StatusBarManager.builder(this)
-                .setStatusBarColor(R.color.colorPrimary)//状态栏颜色
+                .setStatusBarColor(R.color.white)//状态栏颜色
                 .setTintType(StatusBarManager.TintType.PURECOLOR)
                 .setAlpha(0)//不透明度
                 .create();

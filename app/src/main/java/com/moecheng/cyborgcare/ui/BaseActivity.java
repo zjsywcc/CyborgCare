@@ -1,6 +1,10 @@
 package com.moecheng.cyborgcare.ui;
 
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -9,12 +13,24 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.moecheng.cyborgcare.R;
+import com.moecheng.cyborgcare.bluetooth.DeviceConnector;
+import com.moecheng.cyborgcare.bluetooth.format.Utils;
+import com.moecheng.cyborgcare.profile.BluetoothControlActivity;
 import com.moecheng.cyborgcare.statusbar.StatusBarManager;
 import com.moecheng.cyborgcare.util.Compat;
+import com.moecheng.cyborgcare.util.DialogBuilder;
 import com.moecheng.cyborgcare.util.Log;
+
+import java.lang.ref.WeakReference;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.moecheng.cyborgcare.profile.BluetoothActivity.MESSAGE_DEVICE_NAME;
+import static com.moecheng.cyborgcare.profile.BluetoothActivity.MESSAGE_READ;
+import static com.moecheng.cyborgcare.profile.BluetoothActivity.MESSAGE_STATE_CHANGE;
+import static com.moecheng.cyborgcare.profile.BluetoothActivity.MESSAGE_TOAST;
+import static com.moecheng.cyborgcare.profile.BluetoothActivity.MESSAGE_WRITE;
 
 /**
  * Created by wangchengcheng on 2017/11/21.
@@ -28,11 +44,84 @@ public abstract class BaseActivity extends AppCompatActivity {
     @BindView(R.id.toolbar_title_tv)
     TextView toolbarTitleTv;
 
+    // Intent request codes
+    public static final int REQUEST_CONNECT_DEVICE = 1;
+    public static final int REQUEST_ENABLE_BT = 2;
+
+    // Message types sent from the DeviceConnector Handler
+    public static final int MESSAGE_STATE_CHANGE = 1;
+    public static final int MESSAGE_READ = 2;
+    public static final int MESSAGE_WRITE = 3;
+    public static final int MESSAGE_DEVICE_NAME = 4;
+    public static final int MESSAGE_TOAST = 5;
+
+    protected BluetoothAdapter btAdapter;
+
+
+    private static final String SAVED_PENDING_REQUEST_ENABLE_BT = "PENDING_REQUEST_ENABLE_BT";
+
+    boolean pendingRequestEnableBt = false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            pendingRequestEnableBt = savedInstanceState.getBoolean(SAVED_PENDING_REQUEST_ENABLE_BT);
+        }
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (btAdapter == null) {
+            final String no_bluetooth = getString(R.string.no_bt_support);
+            new DialogBuilder(this).create()
+                    .setTitle(R.string.tips)
+                    .setContent(no_bluetooth)
+                    .setPositive(R.string.ok)
+                    .show();
+            Utils.log(no_bluetooth);
+        }
         inflateContent(getContentView());
         initViews();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (btAdapter == null) return;
+
+        if (!btAdapter.isEnabled() && !pendingRequestEnableBt) {
+            pendingRequestEnableBt = true;
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+        }
+    }
+
+    @Override
+    public synchronized void onResume() {
+        super.onResume();
+    }
+    // ==========================================================================
+
+
+    @Override
+    public synchronized void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+    // ==========================================================================
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVED_PENDING_REQUEST_ENABLE_BT, pendingRequestEnableBt);
+    }
+
+    boolean isAdapterReady() {
+        return (btAdapter != null) && (btAdapter.isEnabled());
     }
 
     protected void inflateContent(View view) {
@@ -214,12 +303,14 @@ public abstract class BaseActivity extends AppCompatActivity {
         toolbar = ButterKnife.findById(this, R.id.tool_bar);
         setInflateMenu();
         Log.i("toolbar ", (toolbar.getVisibility() == View.VISIBLE) + "");
-        setTitleBgColor(R.color.colorPrimary);
+        setTitleBgColor(R.color.white);
         new StatusBarManager.builder(this)
-                .setStatusBarColor(R.color.colorPrimary)//状态栏颜色
+                .setStatusBarColor(R.color.white)//状态栏颜色
                 .setTintType(StatusBarManager.TintType.PURECOLOR)
                 .setAlpha(0)//不透明度
                 .create();
     }
+
+
 
 }

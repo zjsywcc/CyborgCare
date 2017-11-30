@@ -12,8 +12,6 @@ import com.moecheng.cyborgcare.profile.ProfileFragment;
 import com.moecheng.cyborgcare.ui.BaseActivity;
 import com.moecheng.cyborgcare.viewcontroller.TabViewController;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.util.ArrayList;
 
 public class MainActivity extends BaseActivity {
@@ -55,6 +53,7 @@ public class MainActivity extends BaseActivity {
         titles.add(getResources().getString(R.string.main_profile_title));
         tabViewController = new TabViewController(this, fragmentArrayList, iconArrayList, titles);
         tabViewController.setScrollable(true);
+        tabViewController.disableOverScrollable();
 
         LinearLayout contentLayout = new LinearLayout(this);
         contentLayout.setOrientation(LinearLayout.VERTICAL);
