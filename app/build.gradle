@@ -61,5 +61,8 @@ dependencies {
     //logger日志
     compile 'com.orhanobut:logger:2.1.1'
 
+    //netty
+    compile 'io.netty:netty-all:4.1.17.Final'
+
     testCompile 'junit:junit:4.12'
 }

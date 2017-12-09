@@ -24,10 +24,16 @@ public class Configurations {
     /**
      * 网络请求基址
      */
-    public static final String REQUEST_URL = "http://192.168.198.244:8080";
+    public static final String REQUEST_URL = "http://192.168.198.243:8080";
     public static final String USER_URL = "/appuser";
     public static final String UPLOAD_URL = "/bluetooth";
     public static final String INFO_URL = "";
+
+    /**
+     * 心跳地址
+     */
+    public static final String HEARTBEAT_URL = "http://192.168.1.115";
+    public static final int HEARTBEAT_PORT = 8080;
     /**
      * 蓝牙UUID
      */

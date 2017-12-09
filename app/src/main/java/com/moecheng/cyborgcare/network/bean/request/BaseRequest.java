@@ -36,4 +36,12 @@ public class BaseRequest {
         this.action = action;
     }
 
+    @Override
+    public String toString() {
+        return "BaseRequest{" +
+                "device='" + device + '\'' +
+                ", android_version='" + android_version + '\'' +
+                ", action='" + action + '\'' +
+                '}';
+    }
 }

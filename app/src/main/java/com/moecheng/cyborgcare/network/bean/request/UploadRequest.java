@@ -25,6 +25,11 @@ public class UploadRequest extends BaseRequest {
 
         private float value;
 
+        public ValuePair(long timestamp, float value) {
+            this.timestamp = timestamp;
+            this.value = value;
+        }
+
         public long getTimestamp() {
             return timestamp;
         }

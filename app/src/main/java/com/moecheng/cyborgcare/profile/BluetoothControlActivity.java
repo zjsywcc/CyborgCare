@@ -145,7 +145,7 @@ public class BluetoothControlActivity extends BaseActivity {
 //        if (mHandler == null) mHandler = new BluetoothResponseHandler(this);
 //        else mHandler.setTarget(this);
 
-        if (mHandler == null) mHandler = new MeasureFragment.BluetoothResponseHandler(MeasureFragment.mECGDataArrayList, MeasureFragment.mECGDataAdapter);
+        if (mHandler == null) mHandler = new MeasureFragment.BluetoothResponseHandler(MeasureFragment.mECGDataArrayList, MeasureFragment.mECGDataAdapter, MeasureFragment.valuePairQueue, MeasureFragment.uploadThread);
 
         if (isConnected() && (savedInstanceState != null)) {
             setDeviceName(savedInstanceState.getString(DEVICE_NAME));

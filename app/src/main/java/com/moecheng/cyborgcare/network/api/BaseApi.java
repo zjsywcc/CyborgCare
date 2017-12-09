@@ -32,7 +32,6 @@ public abstract class BaseApi<REQ extends BaseRequest, RES extends BaseResponse>
                 .build();
         service = retrofit.create(HttpService.class);
         Call<RES> call = getCall(req);
-        Log.i("requestJSON", req.toString());
         call.enqueue(new Callback<RES>() {
             @Override
             public void onResponse(Call<RES> call, Response<RES> response) {

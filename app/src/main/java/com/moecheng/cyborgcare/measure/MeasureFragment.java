@@ -1,12 +1,12 @@
 package com.moecheng.cyborgcare.measure;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +24,10 @@ import com.moecheng.cyborgcare.view.chart.provider.SimpleChartAdapter;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Queue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,7 +56,10 @@ public class MeasureFragment extends Fragment {
     public static final int MESSAGE_READ = 2;
     private static BluetoothResponseHandler mHandler;
 
-    private UploadThread uploadThread;
+    private static Activity mActivity;
+
+    public static UploadThread uploadThread = new UploadThread();
+    public static LinkedBlockingDeque<UploadRequest.ValuePair> valuePairQueue = new LinkedBlockingDeque<>();
 
 
     @Nullable
@@ -62,6 +67,7 @@ public class MeasureFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_measure, container, false);
         ButterKnife.bind(this, rootView);
+        mActivity = getActivity();
         initView(rootView);
         return rootView;
     }
@@ -107,7 +113,7 @@ public class MeasureFragment extends Fragment {
             }
         };
         mECGDataChart.setAdapter(mECGDataAdapter);
-        if (mHandler == null) mHandler = new BluetoothResponseHandler(mECGDataArrayList, mECGDataAdapter);
+        if (mHandler == null) mHandler = new BluetoothResponseHandler(mECGDataArrayList, mECGDataAdapter, valuePairQueue, uploadThread);
 //        fakeECGThread = new FakeECGThread(mECGDataArrayList, mECGDataAdapter);
 //        fakeECGThread.start();
     }
@@ -141,10 +147,14 @@ public class MeasureFragment extends Fragment {
                 try {
                     float value = getRandomECG();
                     list.add(value);
+                    valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value));
                     if (list.size() > ECG_DATA_COUNT) {
                         list.remove(0);
                     }
                     adapter.notifyDataSetChanged();
+                    if(uploadThread.runState.get() == 0) {
+                        uploadThread.start();
+                    }
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     Log.i("fakeECGThreadError", e.toString());
@@ -178,10 +188,14 @@ public class MeasureFragment extends Fragment {
 
         private List<Float> list;
         private LineChartAdapter adapter;
+        private LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs;
+        private UploadThread uploadThread;
 
-        public BluetoothResponseHandler(List<Float> list, LineChartAdapter adapter) {
+        public BluetoothResponseHandler(List<Float> list, LineChartAdapter adapter, LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs, UploadThread uploadThread) {
             this.list = list;
             this.adapter = adapter;
+            this.valuePairs = valuePairs;
+            this.uploadThread = uploadThread;
         }
 
         @Override
@@ -190,17 +204,20 @@ public class MeasureFragment extends Fragment {
                 case MESSAGE_READ:
                     final byte[] readBytes = (byte[]) msg.obj;
                     if (readBytes != null) {
-//                        Logger.addLogAdapter(new DiskLogAdapter());
-//                        Logger.w(Utils.printHex(readMessage));
                         float value = 0;
                         if (readBytes.length > 5) {
-                            value = Math.abs(readBytes[5]);
+                            value = Math.abs(readBytes[0]);
+
                             if (value > 0) {
                                 list.add(value);
                                 if (list.size() > ECG_DATA_COUNT) {
                                     list.remove(0);
                                 }
                                 adapter.notifyDataSetChanged();
+                                valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value));
+                                if(uploadThread.runState.get() == 0) {
+                                    uploadThread.start();
+                                }
                             }
                         }
                         Log.i("bluetoothMsg", value + "");
@@ -211,45 +228,64 @@ public class MeasureFragment extends Fragment {
         }
     }
 
-    public class UploadThread extends Thread {
 
 
-        private Queue<UploadRequest.ValuePair> queue;
 
-        public UploadThread(Queue<UploadRequest.ValuePair> queue) {
-            this.queue = queue;
+    public static class UploadThread extends Thread {
+
+        private AtomicInteger runState;
+
+        public UploadThread() {
+            runState = new AtomicInteger(0);
+        }
+
+        public AtomicInteger getRunState() {
+            return runState;
         }
 
         @Override
         public void run() {
             int count = 0;
-            List<UploadRequest.ValuePair> valuePairs = new ArrayList<>(120);
-            while(!queue.isEmpty()) {
-                UploadRequest.ValuePair valuePair = queue.poll();
-                count++;
-                valuePairs.add(valuePair);
-                if (count % 120 == 0) {
-                    UploadRequest request = new UploadRequest();
-                    request.setAction("upload");
-                    request.setAndroid_version(android.os.Build.VERSION.RELEASE);
-                    request.setDevice(android.os.Build.MODEL);
-                    request.setValuePairs(valuePairs);
-                    UploadApi uploadApi = new UploadApi();
-                    uploadApi.getResponse(request, new BaseApi.Handler<UploadResponse>() {
-                        @Override
-                        public void onSuccess(UploadResponse response) {
-                            Log.i("uploadAction", "上传成功");
-                        }
-
-                        @Override
-                        public void onFailure(UploadResponse response, int errorFlag) {
-                            Log.i("uploadAction", "上传失败");
-                        }
-                    }, getActivity());
-                    valuePairs = new ArrayList<>(120);
+            while(!valuePairQueue.isEmpty()) {
+                runState.set(1);
+                List<UploadRequest.ValuePair> valuePairs = new ArrayList<>();
+                for(int i = 0; i < 60; i++) {
+                    UploadRequest.ValuePair valuePair = null;
+                    try {
+                        valuePair = valuePairQueue.take();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (valuePair != null) {
+                        valuePairs.add(valuePair);
+                    }
                 }
-            }
+                UploadRequest request = new UploadRequest();
+                request.setAction("upload");
+                request.setAndroid_version(android.os.Build.VERSION.RELEASE);
+                request.setDevice(android.os.Build.MODEL);
+                request.setValuePairs(valuePairs);
+                UploadApi uploadApi = new UploadApi();
+                uploadApi.getResponse(request, new BaseApi.Handler<UploadResponse>() {
+                    @Override
+                    public void onSuccess(UploadResponse response) {
+                        if (response != null) {
+                            Log.i("uploadAction", response.getMsg());
+                        }
+                    }
 
+                    @Override
+                    public void onFailure(UploadResponse response, int errorFlag) {
+                        if (response != null) {
+                            Log.i("uploadAction", response.getMsg());
+                        } else {
+                            Log.i("uploadAction", String.format("错误信息 %s:,上传失败", errorFlag));
+                        }
+                    }
+                }, mActivity);
+
+            }
+            runState.set(0);
         }
     }
     // ==========================================================================
