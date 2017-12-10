@@ -6,10 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -29,20 +26,13 @@ import com.moecheng.cyborgcare.bluetooth.DeviceConnector;
 import com.moecheng.cyborgcare.bluetooth.DeviceData;
 import com.moecheng.cyborgcare.bluetooth.format.Utils;
 import com.moecheng.cyborgcare.measure.MeasureFragment;
-import com.moecheng.cyborgcare.network.bean.request.UploadRequest;
 import com.moecheng.cyborgcare.ui.BaseActivity;
-import com.moecheng.cyborgcare.util.Log;
-import com.moecheng.cyborgcare.view.chart.provider.LineChartAdapter;
 
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import butterknife.BindView;
 
-import static com.moecheng.cyborgcare.Configurations.ECG_DATA_COUNT;
 
 
 /**
@@ -61,12 +51,12 @@ public class BluetoothControlActivity extends BaseActivity {
     private static final SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss.SSS");
 
 
-    private static String MSG_NOT_CONNECTED;
-    private static String MSG_CONNECTING;
-    private static String MSG_CONNECTED;
+    public static String MSG_NOT_CONNECTED;
+    public static String MSG_CONNECTING;
+    public static String MSG_CONNECTED;
 
     private static DeviceConnector connector;
-    private static BluetoothResponseHandler mHandler;
+    private static MeasureFragment.BluetoothResponseHandler mHandler;
 
 
 
@@ -152,7 +142,7 @@ public class BluetoothControlActivity extends BaseActivity {
         PreferenceManager.setDefaultValues(this, R.xml.activity_bluetoothsetting, false);
 
         if (mHandler == null)
-            mHandler = new BluetoothResponseHandler(MeasureFragment.mECGDataArrayList, MeasureFragment.mECGDataAdapter, MeasureFragment.valuePairQueue, MeasureFragment.uploadThread, this);
+            mHandler = new MeasureFragment.BluetoothResponseHandler(MeasureFragment.mECGDataArrayList, MeasureFragment.mECGDataAdapter, MeasureFragment.valuePairQueue, MeasureFragment.uploadThread, this);
         else
             mHandler.setTarget(this);
 
@@ -516,84 +506,6 @@ public class BluetoothControlActivity extends BaseActivity {
     // =========================================================================
 
 
-    /**
-     * 用于从蓝牙流接收数据的处理器
-     */
-    public static class BluetoothResponseHandler extends Handler {
 
-        private WeakReference<BluetoothControlActivity> mActivity;
-
-        public void setTarget(BluetoothControlActivity target) {
-            mActivity.clear();
-            mActivity = new WeakReference<BluetoothControlActivity>(target);
-        }
-
-        private List<Float> list;
-        private LineChartAdapter adapter;
-        private LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs;
-        private MeasureFragment.UploadThread uploadThread;
-
-        public BluetoothResponseHandler(List<Float> list, LineChartAdapter adapter,
-                                        LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs, MeasureFragment.UploadThread uploadThread,
-                                        BluetoothControlActivity activity) {
-            this.list = list;
-            this.adapter = adapter;
-            this.valuePairs = valuePairs;
-            this.uploadThread = uploadThread;
-            this.mActivity = new WeakReference<BluetoothControlActivity>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            BluetoothControlActivity activity = mActivity.get();
-            if (activity != null) {
-            switch (msg.what) {
-                case MESSAGE_STATE_CHANGE:
-
-                    Log.i("MESSAGE_STATE_CHANGE: ", msg.arg1 + "");
-                    final Toolbar bar = activity.getToolbar();
-                    switch (msg.arg1) {
-                        case DeviceConnector.STATE_CONNECTED:
-                            bar.setSubtitle(MSG_CONNECTED);
-                            break;
-                        case DeviceConnector.STATE_CONNECTING:
-                            bar.setSubtitle(MSG_CONNECTING);
-                            break;
-                        case DeviceConnector.STATE_NONE:
-                            bar.setSubtitle(MSG_NOT_CONNECTED);
-                            break;
-                    }
-                    activity.invalidateOptionsMenu();
-                    break;
-
-                case MESSAGE_READ:
-                    final byte[] readBytes = (byte[]) msg.obj;
-                    if (readBytes != null) {
-                        float value = 0;
-                        if (readBytes.length > 5) {
-                            value = Math.abs(readBytes[0]);
-
-                            if (value > 0) {
-                                list.add(value);
-                                if (list.size() > ECG_DATA_COUNT) {
-                                    list.remove(0);
-                                }
-                                adapter.notifyDataSetChanged();
-                                MeasureFragment.valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value));
-                                if (uploadThread.getRunState().get() == 0) {
-                                    uploadThread.start();
-                                }
-                            }
-                        }
-                        Log.i("bluetoothMsg", value + "");
-                    }
-                    break;
-                case MESSAGE_DEVICE_NAME:
-                        activity.setDeviceName((String) msg.obj);
-                        break;
-                }
-            }
-        }
-    }
     // ==========================================================================
 }
