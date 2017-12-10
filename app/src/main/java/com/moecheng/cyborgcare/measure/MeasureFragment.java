@@ -243,11 +243,18 @@ public class MeasureFragment extends Fragment {
             return runState;
         }
 
+        private void setRunState(int state) {
+            this.runState.getAndSet(state);
+        }
+
+        public void stopUploading() {
+            setRunState(0);
+        }
+
         @Override
         public void run() {
-            int count = 0;
-            while(!valuePairQueue.isEmpty()) {
-                runState.set(1);
+            runState.set(1);
+            while(!valuePairQueue.isEmpty() && getRunState().get() == 1) {
                 List<UploadRequest.ValuePair> valuePairs = new ArrayList<>();
                 for(int i = 0; i < 60; i++) {
                     UploadRequest.ValuePair valuePair = null;
@@ -288,6 +295,8 @@ public class MeasureFragment extends Fragment {
             runState.set(0);
         }
     }
+
+
     // ==========================================================================
 
 

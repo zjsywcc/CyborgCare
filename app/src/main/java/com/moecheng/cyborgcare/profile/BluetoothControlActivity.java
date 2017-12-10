@@ -231,8 +231,8 @@ public class BluetoothControlActivity extends BaseActivity {
         final MenuItem menuSettings = menu.findItem(R.id.menu_settings);
         menuSettings.setVisible(false);
         if (bluetooth != null) bluetooth.setIcon(this.isConnected() ?
-                R.mipmap.ic_action_device_bluetooth_connected :
-                R.mipmap.ic_action_device_bluetooth);
+                R.mipmap.ic_action_bluetooth_connected :
+                R.mipmap.ic_action_bluetooth);
         bluetooth.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
