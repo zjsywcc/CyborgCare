@@ -3,8 +3,6 @@ package com.moecheng.cyborgcare.measure;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -32,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.moecheng.cyborgcare.Configurations.ECG_DATA_COUNT;
 
 
 /**
@@ -48,13 +47,12 @@ public class MeasureFragment extends Fragment {
     public static ArrayList<Float> mECGDataArrayList;
     public static LineChartAdapter mECGDataAdapter;
 
-    private static final int ECG_DATA_COUNT = 10;
+
 
     private DecimalFormat formatter;
     private FakeECGThread fakeECGThread;
 
     public static final int MESSAGE_READ = 2;
-    private static BluetoothResponseHandler mHandler;
 
     private static Activity mActivity;
 
@@ -113,7 +111,7 @@ public class MeasureFragment extends Fragment {
             }
         };
         mECGDataChart.setAdapter(mECGDataAdapter);
-        if (mHandler == null) mHandler = new BluetoothResponseHandler(mECGDataArrayList, mECGDataAdapter, valuePairQueue, uploadThread);
+//        if (mHandler == null) mHandler = new BluetoothResponseHandler(mECGDataArrayList, mECGDataAdapter, valuePairQueue, uploadThread);
 //        fakeECGThread = new FakeECGThread(mECGDataArrayList, mECGDataAdapter);
 //        fakeECGThread.start();
     }
@@ -180,54 +178,6 @@ public class MeasureFragment extends Fragment {
         float randomECG = (float) (50 + Math.random() * 50);
         return randomECG;
     }
-
-    /**
-     * 用于从蓝牙流接收数据的处理器
-     */
-    public static class BluetoothResponseHandler extends Handler {
-
-        private List<Float> list;
-        private LineChartAdapter adapter;
-        private LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs;
-        private UploadThread uploadThread;
-
-        public BluetoothResponseHandler(List<Float> list, LineChartAdapter adapter, LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs, UploadThread uploadThread) {
-            this.list = list;
-            this.adapter = adapter;
-            this.valuePairs = valuePairs;
-            this.uploadThread = uploadThread;
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MESSAGE_READ:
-                    final byte[] readBytes = (byte[]) msg.obj;
-                    if (readBytes != null) {
-                        float value = 0;
-                        if (readBytes.length > 5) {
-                            value = Math.abs(readBytes[0]);
-
-                            if (value > 0) {
-                                list.add(value);
-                                if (list.size() > ECG_DATA_COUNT) {
-                                    list.remove(0);
-                                }
-                                adapter.notifyDataSetChanged();
-                                valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value));
-                                if(uploadThread.runState.get() == 0) {
-                                    uploadThread.start();
-                                }
-                            }
-                        }
-                        Log.i("bluetoothMsg", value + "");
-                    }
-                    break;
-
-            }
-        }
-    }
-
 
 
 

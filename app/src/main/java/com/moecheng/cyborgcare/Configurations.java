@@ -42,6 +42,12 @@ public class Configurations {
      * 蓝牙服务名
      */
     public static final String btServerName = "CyborgCare_Android_Client";
+
+    /**
+     * 蓝牙数据chart横坐标
+     */
+    public static final int ECG_DATA_COUNT = 10;
+
     /**
      * shared preference的名字
      */

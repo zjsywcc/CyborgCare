@@ -58,7 +58,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected BluetoothAdapter btAdapter;
 
 
-    private static final String SAVED_PENDING_REQUEST_ENABLE_BT = "PENDING_REQUEST_ENABLE_BT";
+    public static final String SAVED_PENDING_REQUEST_ENABLE_BT = "PENDING_REQUEST_ENABLE_BT";
 
     boolean pendingRequestEnableBt = false;
 
@@ -120,7 +120,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         outState.putBoolean(SAVED_PENDING_REQUEST_ENABLE_BT, pendingRequestEnableBt);
     }
 
-    boolean isAdapterReady() {
+    protected boolean isAdapterReady() {
         return (btAdapter != null) && (btAdapter.isEnabled());
     }
 

@@ -29,15 +29,20 @@ import com.moecheng.cyborgcare.bluetooth.DeviceConnector;
 import com.moecheng.cyborgcare.bluetooth.DeviceData;
 import com.moecheng.cyborgcare.bluetooth.format.Utils;
 import com.moecheng.cyborgcare.measure.MeasureFragment;
+import com.moecheng.cyborgcare.network.bean.request.UploadRequest;
 import com.moecheng.cyborgcare.ui.BaseActivity;
 import com.moecheng.cyborgcare.util.Log;
+import com.moecheng.cyborgcare.view.chart.provider.LineChartAdapter;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import butterknife.BindView;
 
+import static com.moecheng.cyborgcare.Configurations.ECG_DATA_COUNT;
 
 
 /**
@@ -61,7 +66,7 @@ public class BluetoothControlActivity extends BaseActivity {
     private static String MSG_CONNECTED;
 
     private static DeviceConnector connector;
-    private static MeasureFragment.BluetoothResponseHandler mHandler;
+    private static BluetoothResponseHandler mHandler;
 
 
 
@@ -139,13 +144,17 @@ public class BluetoothControlActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            pendingRequestEnableBt =
+                    savedInstanceState.getBoolean(SAVED_PENDING_REQUEST_ENABLE_BT);
+        }
         outState = savedInstanceState;
         PreferenceManager.setDefaultValues(this, R.xml.activity_bluetoothsetting, false);
 
-//        if (mHandler == null) mHandler = new BluetoothResponseHandler(this);
-//        else mHandler.setTarget(this);
-
-        if (mHandler == null) mHandler = new MeasureFragment.BluetoothResponseHandler(MeasureFragment.mECGDataArrayList, MeasureFragment.mECGDataAdapter, MeasureFragment.valuePairQueue, MeasureFragment.uploadThread);
+        if (mHandler == null)
+            mHandler = new BluetoothResponseHandler(MeasureFragment.mECGDataArrayList, MeasureFragment.mECGDataAdapter, MeasureFragment.valuePairQueue, MeasureFragment.uploadThread, this);
+        else
+            mHandler.setTarget(this);
 
         if (isConnected() && (savedInstanceState != null)) {
             setDeviceName(savedInstanceState.getString(DEVICE_NAME));
@@ -155,8 +164,8 @@ public class BluetoothControlActivity extends BaseActivity {
 
         if (savedInstanceState != null)
             this.logHtml.append(savedInstanceState.getString(LOG));
-
-
+        setSupportActionBar(getToolbar());
+        getSupportActionBar().setTitle(null);
     }
     // ==========================================================================
 
@@ -193,6 +202,8 @@ public class BluetoothControlActivity extends BaseActivity {
             deviceName = null;
         }
     }
+
+
     // ==========================================================================
 
     public void setDeviceName(String deviceName) {
@@ -212,14 +223,54 @@ public class BluetoothControlActivity extends BaseActivity {
         return false;
     }
 
-    /**
-     * 检查蓝牙适配器
-     *
-     * @return - 如果蓝牙适配器已经就绪，则为true
-     */
-    boolean isAdapterReady() {
-        return (btAdapter != null) && (btAdapter.isEnabled());
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.device_control_activity, menu);
+        final MenuItem bluetooth = menu.findItem(R.id.menu_search);
+        if (bluetooth != null) bluetooth.setIcon(this.isConnected() ?
+                R.mipmap.ic_action_bluetooth_connected :
+                R.mipmap.ic_action_bluetooth);
+        return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.menu_search:
+                if (super.isAdapterReady()) {
+                    if (isConnected()) stopConnection();
+                    else startDeviceListActivity();
+                } else {
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                }
+                return true;
+
+            case R.id.menu_clear:
+                if (logTextView != null) logTextView.setText("");
+                return true;
+
+            case R.id.menu_send:
+                if (logTextView != null) {
+                    final String msg = logTextView.getText().toString();
+                    final Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_TEXT, msg);
+                    startActivity(Intent.createChooser(intent, getString(R.string.menu_send)));
+                }
+                return true;
+
+            case R.id.menu_settings:
+                final Intent intent = new Intent(this, BluetoothSettingActivity.class);
+                startActivity(intent);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     // ==========================================================================
 
 
@@ -231,8 +282,8 @@ public class BluetoothControlActivity extends BaseActivity {
         final MenuItem menuSettings = menu.findItem(R.id.menu_settings);
         menuSettings.setVisible(false);
         if (bluetooth != null) bluetooth.setIcon(this.isConnected() ?
-                R.mipmap.ic_action_device_bluetooth_connected :
-                R.mipmap.ic_action_device_bluetooth);
+                R.mipmap.ic_action_bluetooth_connected :
+                R.mipmap.ic_action_bluetooth);
         bluetooth.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -309,7 +360,7 @@ public class BluetoothControlActivity extends BaseActivity {
 
 
     /**
-     * Получить из настроек признак окончания команды
+     * 从设置中获取命令的结尾
      */
     private String getCommandEnding() {
         String result = Utils.getPrefence(this, getString(R.string.pref_commands_ending));
@@ -464,61 +515,81 @@ public class BluetoothControlActivity extends BaseActivity {
     }
     // =========================================================================
 
+
     /**
      * 用于从蓝牙流接收数据的处理器
      */
-    protected class BluetoothResponseHandler extends Handler {
-        private WeakReference<BluetoothControlActivity> mActivity;
+    public static class BluetoothResponseHandler extends Handler {
 
-        public BluetoothResponseHandler(BluetoothControlActivity activity) {
-            mActivity = new WeakReference<BluetoothControlActivity>(activity);
-        }
+        private WeakReference<BluetoothControlActivity> mActivity;
 
         public void setTarget(BluetoothControlActivity target) {
             mActivity.clear();
             mActivity = new WeakReference<BluetoothControlActivity>(target);
         }
 
+        private List<Float> list;
+        private LineChartAdapter adapter;
+        private LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs;
+        private MeasureFragment.UploadThread uploadThread;
+
+        public BluetoothResponseHandler(List<Float> list, LineChartAdapter adapter,
+                                        LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs, MeasureFragment.UploadThread uploadThread,
+                                        BluetoothControlActivity activity) {
+            this.list = list;
+            this.adapter = adapter;
+            this.valuePairs = valuePairs;
+            this.uploadThread = uploadThread;
+            this.mActivity = new WeakReference<BluetoothControlActivity>(activity);
+        }
+
         @Override
         public void handleMessage(Message msg) {
             BluetoothControlActivity activity = mActivity.get();
             if (activity != null) {
-                switch (msg.what) {
-                    case MESSAGE_STATE_CHANGE:
+            switch (msg.what) {
+                case MESSAGE_STATE_CHANGE:
 
-                        Log.i("MESSAGE_STATE_CHANGE: ", msg.arg1 + "");
-                        final Toolbar bar = activity.getToolbar();
-                        switch (msg.arg1) {
-                            case DeviceConnector.STATE_CONNECTED:
-                                bar.setSubtitle(MSG_CONNECTED);
-                                break;
-                            case DeviceConnector.STATE_CONNECTING:
-                                bar.setSubtitle(MSG_CONNECTING);
-                                break;
-                            case DeviceConnector.STATE_NONE:
-                                bar.setSubtitle(MSG_NOT_CONNECTED);
-                                break;
+                    Log.i("MESSAGE_STATE_CHANGE: ", msg.arg1 + "");
+                    final Toolbar bar = activity.getToolbar();
+                    switch (msg.arg1) {
+                        case DeviceConnector.STATE_CONNECTED:
+                            bar.setSubtitle(MSG_CONNECTED);
+                            break;
+                        case DeviceConnector.STATE_CONNECTING:
+                            bar.setSubtitle(MSG_CONNECTING);
+                            break;
+                        case DeviceConnector.STATE_NONE:
+                            bar.setSubtitle(MSG_NOT_CONNECTED);
+                            break;
+                    }
+                    activity.invalidateOptionsMenu();
+                    break;
+
+                case MESSAGE_READ:
+                    final byte[] readBytes = (byte[]) msg.obj;
+                    if (readBytes != null) {
+                        float value = 0;
+                        if (readBytes.length > 5) {
+                            value = Math.abs(readBytes[0]);
+
+                            if (value > 0) {
+                                list.add(value);
+                                if (list.size() > ECG_DATA_COUNT) {
+                                    list.remove(0);
+                                }
+                                adapter.notifyDataSetChanged();
+                                MeasureFragment.valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value));
+                                if (uploadThread.getRunState().get() == 0) {
+                                    uploadThread.start();
+                                }
+                            }
                         }
-                        activity.invalidateOptionsMenu();
-                        break;
-
-                    case MESSAGE_READ:
-                        final String readMessage = (String) msg.obj;
-                        if (readMessage != null) {
-                            activity.appendLog(readMessage, false, false, activity.needClean);
-                        }
-                        break;
-
-                    case MESSAGE_DEVICE_NAME:
+                        Log.i("bluetoothMsg", value + "");
+                    }
+                    break;
+                case MESSAGE_DEVICE_NAME:
                         activity.setDeviceName((String) msg.obj);
-                        break;
-
-                    case MESSAGE_WRITE:
-                        // stub
-                        break;
-
-                    case MESSAGE_TOAST:
-                        // stub
                         break;
                 }
             }
