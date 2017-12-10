@@ -120,7 +120,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         outState.putBoolean(SAVED_PENDING_REQUEST_ENABLE_BT, pendingRequestEnableBt);
     }
 
-    boolean isAdapterReady() {
+    protected boolean isAdapterReady() {
         return (btAdapter != null) && (btAdapter.isEnabled());
     }
 

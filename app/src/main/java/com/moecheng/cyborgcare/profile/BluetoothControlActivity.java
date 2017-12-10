@@ -56,9 +56,9 @@ public class BluetoothControlActivity extends BaseActivity {
     private static final SimpleDateFormat timeformat = new SimpleDateFormat("HH:mm:ss.SSS");
 
 
-    private static String MSG_NOT_CONNECTED;
-    private static String MSG_CONNECTING;
-    private static String MSG_CONNECTED;
+    public static String MSG_NOT_CONNECTED;
+    public static String MSG_CONNECTING;
+    public static String MSG_CONNECTED;
 
     private static DeviceConnector connector;
     private static MeasureFragment.BluetoothResponseHandler mHandler;
@@ -87,6 +87,12 @@ public class BluetoothControlActivity extends BaseActivity {
     private String deviceName;
 
     private Bundle outState;
+
+    private static BluetoothControlActivity mActivity;
+
+    public static BluetoothControlActivity getInstance() {
+        return mActivity;
+    }
 
     @Override
     public void initViews() {
@@ -139,13 +145,17 @@ public class BluetoothControlActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mActivity = this;
         outState = savedInstanceState;
         PreferenceManager.setDefaultValues(this, R.xml.activity_bluetoothsetting, false);
 
 //        if (mHandler == null) mHandler = new BluetoothResponseHandler(this);
 //        else mHandler.setTarget(this);
 
-        if (mHandler == null) mHandler = new MeasureFragment.BluetoothResponseHandler(MeasureFragment.mECGDataArrayList, MeasureFragment.mECGDataAdapter, MeasureFragment.valuePairQueue, MeasureFragment.uploadThread);
+        if (mHandler == null)
+            mHandler = new MeasureFragment.BluetoothResponseHandler(MeasureFragment.mECGDataArrayList, MeasureFragment.mECGDataAdapter, MeasureFragment.valuePairQueue, MeasureFragment.uploadThread, this);
+        else
+            mHandler.setTarget(this);
 
         if (isConnected() && (savedInstanceState != null)) {
             setDeviceName(savedInstanceState.getString(DEVICE_NAME));
@@ -155,7 +165,8 @@ public class BluetoothControlActivity extends BaseActivity {
 
         if (savedInstanceState != null)
             this.logHtml.append(savedInstanceState.getString(LOG));
-
+        setSupportActionBar(getToolbar());
+        getSupportActionBar().setTitle(null);
 
     }
     // ==========================================================================
@@ -212,16 +223,55 @@ public class BluetoothControlActivity extends BaseActivity {
         return false;
     }
 
-    /**
-     * 检查蓝牙适配器
-     *
-     * @return - 如果蓝牙适配器已经就绪，则为true
-     */
-    boolean isAdapterReady() {
-        return (btAdapter != null) && (btAdapter.isEnabled());
-    }
     // ==========================================================================
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.device_control_activity, menu);
+        final MenuItem bluetooth = menu.findItem(R.id.menu_search);
+        if (bluetooth != null) bluetooth.setIcon(this.isConnected() ?
+                R.mipmap.ic_action_bluetooth_connected :
+                R.mipmap.ic_action_bluetooth);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.menu_search:
+                if (super.isAdapterReady()) {
+                    if (isConnected()) stopConnection();
+                    else startDeviceListActivity();
+                } else {
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                }
+                return true;
+
+            case R.id.menu_clear:
+                if (logTextView != null) logTextView.setText("");
+                return true;
+
+            case R.id.menu_send:
+                if (logTextView != null) {
+                    final String msg = logTextView.getText().toString();
+                    final Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_TEXT, msg);
+                    startActivity(Intent.createChooser(intent, getString(R.string.menu_send)));
+                }
+                return true;
+
+            case R.id.menu_settings:
+                final Intent intent = new Intent(this, BluetoothSettingActivity.class);
+                startActivity(intent);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
 
     private void setMenu(Menu menu) {

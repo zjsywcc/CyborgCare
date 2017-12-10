@@ -7,21 +7,25 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.moecheng.cyborgcare.R;
+import com.moecheng.cyborgcare.bluetooth.DeviceConnector;
 import com.moecheng.cyborgcare.network.api.BaseApi;
 import com.moecheng.cyborgcare.network.api.UploadApi;
 import com.moecheng.cyborgcare.network.bean.request.UploadRequest;
 import com.moecheng.cyborgcare.network.bean.response.UploadResponse;
+import com.moecheng.cyborgcare.profile.BluetoothControlActivity;
 import com.moecheng.cyborgcare.util.Log;
 import com.moecheng.cyborgcare.view.chart.Chart;
 import com.moecheng.cyborgcare.view.chart.ShadowLineChart;
 import com.moecheng.cyborgcare.view.chart.provider.LineChartAdapter;
 import com.moecheng.cyborgcare.view.chart.provider.SimpleChartAdapter;
 
+import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,6 +36,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.moecheng.cyborgcare.ui.BaseActivity.MESSAGE_DEVICE_NAME;
+import static com.moecheng.cyborgcare.ui.BaseActivity.MESSAGE_STATE_CHANGE;
 
 
 /**
@@ -59,7 +65,7 @@ public class MeasureFragment extends Fragment {
     private static Activity mActivity;
 
     public static UploadThread uploadThread = new UploadThread();
-    public static LinkedBlockingDeque<UploadRequest.ValuePair> valuePairQueue = new LinkedBlockingDeque<>();
+    public static final LinkedBlockingDeque<UploadRequest.ValuePair> valuePairQueue = new LinkedBlockingDeque<>();
 
 
     @Nullable
@@ -113,7 +119,8 @@ public class MeasureFragment extends Fragment {
             }
         };
         mECGDataChart.setAdapter(mECGDataAdapter);
-        if (mHandler == null) mHandler = new BluetoothResponseHandler(mECGDataArrayList, mECGDataAdapter, valuePairQueue, uploadThread);
+        if (mHandler == null && BluetoothControlActivity.getInstance() != null)
+            mHandler = new BluetoothResponseHandler(mECGDataArrayList, mECGDataAdapter, valuePairQueue, uploadThread, BluetoothControlActivity.getInstance());
 //        fakeECGThread = new FakeECGThread(mECGDataArrayList, mECGDataAdapter);
 //        fakeECGThread.start();
     }
@@ -152,7 +159,7 @@ public class MeasureFragment extends Fragment {
                         list.remove(0);
                     }
                     adapter.notifyDataSetChanged();
-                    if(uploadThread.runState.get() == 0) {
+                    if (uploadThread.runState.get() == 0) {
                         uploadThread.start();
                     }
                     Thread.sleep(500);
@@ -186,49 +193,79 @@ public class MeasureFragment extends Fragment {
      */
     public static class BluetoothResponseHandler extends Handler {
 
+        private WeakReference<BluetoothControlActivity> mActivity;
+
+        public void setTarget(BluetoothControlActivity target) {
+            mActivity.clear();
+            mActivity = new WeakReference<BluetoothControlActivity>(target);
+        }
+
         private List<Float> list;
         private LineChartAdapter adapter;
         private LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs;
         private UploadThread uploadThread;
 
-        public BluetoothResponseHandler(List<Float> list, LineChartAdapter adapter, LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs, UploadThread uploadThread) {
+        public BluetoothResponseHandler(List<Float> list, LineChartAdapter adapter, LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs, UploadThread uploadThread
+                , BluetoothControlActivity activity) {
             this.list = list;
             this.adapter = adapter;
             this.valuePairs = valuePairs;
             this.uploadThread = uploadThread;
+            this.mActivity = new WeakReference<BluetoothControlActivity>(activity);
         }
 
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MESSAGE_READ:
-                    final byte[] readBytes = (byte[]) msg.obj;
-                    if (readBytes != null) {
-                        float value = 0;
-                        if (readBytes.length > 5) {
-                            value = Math.abs(readBytes[0]);
+            BluetoothControlActivity activity = mActivity.get();
+            if (activity != null) {
+                switch (msg.what) {
+                    case MESSAGE_STATE_CHANGE:
 
-                            if (value > 0) {
-                                list.add(value);
-                                if (list.size() > ECG_DATA_COUNT) {
-                                    list.remove(0);
-                                }
-                                adapter.notifyDataSetChanged();
-                                valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value));
-                                if(uploadThread.runState.get() == 0) {
-                                    uploadThread.start();
+                        Log.i("MESSAGE_STATE_CHANGE: ", msg.arg1 + "");
+                        final Toolbar bar = activity.getToolbar();
+                        switch (msg.arg1) {
+                            case DeviceConnector.STATE_CONNECTED:
+                                bar.setSubtitle(BluetoothControlActivity.MSG_CONNECTED);
+                                break;
+                            case DeviceConnector.STATE_CONNECTING:
+                                bar.setSubtitle(BluetoothControlActivity.MSG_CONNECTING);
+                                break;
+                            case DeviceConnector.STATE_NONE:
+                                bar.setSubtitle(BluetoothControlActivity.MSG_NOT_CONNECTED);
+                                break;
+                        }
+                        activity.invalidateOptionsMenu();
+                        break;
+                    case MESSAGE_READ:
+                        final byte[] readBytes = (byte[]) msg.obj;
+                        if (readBytes != null) {
+                            float value = 0;
+                            if (readBytes.length > 5) {
+                                value = Math.abs(readBytes[0]);
+
+                                if (value > 0) {
+                                    list.add(value);
+                                    if (list.size() > ECG_DATA_COUNT) {
+                                        list.remove(0);
+                                    }
+                                    adapter.notifyDataSetChanged();
+                                    valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value));
+                                    if (uploadThread.runState.get() == 0) {
+                                        uploadThread.start();
+                                    }
                                 }
                             }
+                            Log.i("bluetoothMsg", value + "");
                         }
-                        Log.i("bluetoothMsg", value + "");
-                    }
-                    break;
+                        break;
+                    case MESSAGE_DEVICE_NAME:
+                        activity.setDeviceName((String) msg.obj);
+                        break;
 
+                }
             }
         }
     }
-
-
 
 
     public static class UploadThread extends Thread {
@@ -254,12 +291,14 @@ public class MeasureFragment extends Fragment {
         @Override
         public void run() {
             runState.set(1);
-            while(!valuePairQueue.isEmpty() && getRunState().get() == 1) {
+            while (!valuePairQueue.isEmpty() && getRunState().get() == 1) {
                 List<UploadRequest.ValuePair> valuePairs = new ArrayList<>();
-                for(int i = 0; i < 60; i++) {
+                for (int i = 0; i < 60; i++) {
                     UploadRequest.ValuePair valuePair = null;
                     try {
-                        valuePair = valuePairQueue.take();
+                        synchronized (valuePairQueue) {
+                            valuePair = valuePairQueue.take();
+                        }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
