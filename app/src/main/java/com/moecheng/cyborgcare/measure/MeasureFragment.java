@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.moecheng.cyborgcare.Configurations;
 import com.moecheng.cyborgcare.R;
 import com.moecheng.cyborgcare.bluetooth.DeviceConnector;
 import com.moecheng.cyborgcare.network.api.BaseApi;
@@ -19,6 +20,7 @@ import com.moecheng.cyborgcare.network.api.UploadApi;
 import com.moecheng.cyborgcare.network.bean.request.UploadRequest;
 import com.moecheng.cyborgcare.network.bean.response.UploadResponse;
 import com.moecheng.cyborgcare.profile.BluetoothControlActivity;
+import com.moecheng.cyborgcare.util.ByteUtil;
 import com.moecheng.cyborgcare.util.Log;
 import com.moecheng.cyborgcare.view.chart.Chart;
 import com.moecheng.cyborgcare.view.chart.ShadowLineChart;
@@ -35,6 +37,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 import static com.moecheng.cyborgcare.ui.BaseActivity.MESSAGE_DEVICE_NAME;
 import static com.moecheng.cyborgcare.ui.BaseActivity.MESSAGE_STATE_CHANGE;
@@ -66,6 +70,8 @@ public class MeasureFragment extends Fragment {
 
     public static UploadThread uploadThread = new UploadThread();
     public static final LinkedBlockingDeque<UploadRequest.ValuePair> valuePairQueue = new LinkedBlockingDeque<>();
+
+    private static ByteBuf buffer = Unpooled.buffer(1024 * 1000);
 
 
     @Nullable
@@ -238,24 +244,59 @@ public class MeasureFragment extends Fragment {
                         break;
                     case MESSAGE_READ:
                         final byte[] readBytes = (byte[]) msg.obj;
-                        if (readBytes != null) {
-                            float value = 0;
-                            if (readBytes.length > 5) {
-                                value = Math.abs(readBytes[0]);
-
-                                if (value > 0) {
-                                    list.add(value);
-                                    if (list.size() > ECG_DATA_COUNT) {
-                                        list.remove(0);
-                                    }
-                                    adapter.notifyDataSetChanged();
-                                    valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value));
-                                    if (uploadThread.runState.get() == 0) {
-                                        uploadThread.start();
-                                    }
+                        if (readBytes != null && readBytes.length > 0) {
+                            /**
+                             * 处理源源不断的字符数组 通过netty ByteBuf解决蓝牙粘包丢包问题
+                             */
+                            buffer.writeBytes(readBytes);     //将蓝牙收到的byte数组放入bytebuf缓冲区中
+                            //   Log.i("tag", "缓冲区大小" + buffer.readableBytes() + "");
+                            byte[] validData = new byte[Configurations.FRAME_LENGTH];
+                            //重新组帧
+                            while (buffer.readableBytes() > Configurations.FRAME_LENGTH) {     //判断缓冲区大小大于一帧长度，就可以进行解帧
+                                ByteBuf bufTemp = buffer.readBytes(1);    //先取第一个字节，判断是不是帧头的第一个字节0xFF
+                                byte[] bytesTemp = new byte[1];
+                                bufTemp.readBytes(bytesTemp);
+                                if (bytesTemp[0] == (byte) 0xFF) {        //判断第一个字节是不是0xFF，如果不是，直接丢弃，如果是，则进入if判断
+                                    ByteBuf bufTemp2 = buffer.readBytes(Configurations.FRAME_LENGTH - 1);
+                                    byte[] bytesTemp2 = new byte[Configurations.FRAME_LENGTH - 1];
+                                    bufTemp2.readBytes(bytesTemp2);
+                                    /**
+                                     * TODO 判断帧尾部分
+                                     */
+                                    //取出帧的后续部分，还需要判断帧尾是不是包含一个奇偶校验位的0x00；如果不是0x00，说明这个帧不完整，即需要重新进入第二个字节搜索帧头
+//                                    if (bytesTemp2[bytesTemp2.length - 1] > 1) {
+//                                        buffer.resetReaderIndex();   //指针回滚，回滚到只是取出第一个数
+//                                        continue;       //重新进入while循环
+//                                    }
+                                    //重新组帧
+                                    byte[] bytesTemp3 = new byte[Configurations.FRAME_LENGTH];
+                                    bytesTemp3[0] = (byte) 0xFF;
+                                    System.arraycopy(bytesTemp2, 0, bytesTemp3, 1, bytesTemp2.length);
+                                    //如果是，则放入list
+                                    validData = bytesTemp3;     //放入byteListInbuf链表的帧shiw
+                                    buffer.discardReadBytes();  //将取出来的这一帧数据在buffer的内存进行清除，释放内存
+                                    break;
+                                } else {       //第一个字节不是0xff情况
+                                    buffer.resetReaderIndex();   //指针回滚，回滚到只是取出第一个数
+                                    continue;
                                 }
                             }
+                            float value = validData[1];
                             Log.i("bluetoothMsg", value + "");
+                            if (value % 16 != 0) {
+                                Log.i("BluetoothMsgErrValue", ByteUtil.byteArrayToHexStr(validData));
+                            } else {
+                                Log.i("BluetoothMsgValidValue", ByteUtil.byteArrayToHexStr(validData));
+                            }
+                            list.add(value);
+                            if (list.size() > ECG_DATA_COUNT) {
+                                list.remove(0);
+                            }
+                            adapter.notifyDataSetChanged();
+                            valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value));
+                            if (uploadThread.runState.get() == 0) {
+                                uploadThread.start();
+                            }
                         }
                         break;
                     case MESSAGE_DEVICE_NAME:

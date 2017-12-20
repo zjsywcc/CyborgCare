@@ -43,6 +43,10 @@ public class Configurations {
      */
     public static final String btServerName = "CyborgCare_Android_Client";
     /**
+     * 蓝牙帧长度
+     */
+    public static final int FRAME_LENGTH = 10;
+    /**
      * shared preference的名字
      */
     public static final String PREFERENCE_NAME = "com.moecheng.cyborgcare.preference";
