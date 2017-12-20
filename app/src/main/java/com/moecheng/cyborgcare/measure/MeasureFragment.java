@@ -256,7 +256,9 @@ public class MeasureFragment extends Fragment {
                                 ByteBuf bufTemp = buffer.readBytes(1);    //先取第一个字节，判断是不是帧头的第一个字节0xFF
                                 byte[] bytesTemp = new byte[1];
                                 bufTemp.readBytes(bytesTemp);
-                                if (bytesTemp[0] == (byte) 0xFF) {        //判断第一个字节是不是0xFF，如果不是，直接丢弃，如果是，则进入if判断
+                                //判断第一个字节是不是0xFF，如果不是，直接丢弃，如果是，则进入if判断
+                                if (bytesTemp[0] == (byte) 0xFF) {
+                                    buffer.markReaderIndex();
                                     ByteBuf bufTemp2 = buffer.readBytes(Configurations.FRAME_LENGTH - 1);
                                     byte[] bytesTemp2 = new byte[Configurations.FRAME_LENGTH - 1];
                                     bufTemp2.readBytes(bytesTemp2);
@@ -281,21 +283,23 @@ public class MeasureFragment extends Fragment {
                                     continue;
                                 }
                             }
-                            float value = validData[1];
-                            Log.i("bluetoothMsg", value + "");
-                            if (value % 16 != 0) {
-                                Log.i("BluetoothMsgErrValue", ByteUtil.byteArrayToHexStr(validData));
-                            } else {
-                                Log.i("BluetoothMsgValidValue", ByteUtil.byteArrayToHexStr(validData));
-                            }
-                            list.add(value);
-                            if (list.size() > ECG_DATA_COUNT) {
-                                list.remove(0);
-                            }
-                            adapter.notifyDataSetChanged();
-                            valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value));
-                            if (uploadThread.runState.get() == 0) {
-                                uploadThread.start();
+                            if (validData[0] != 0x00) {
+                                float value = validData[1] & 0xFF;
+                                Log.i("bluetoothMsg", value + "");
+                                if (value % 16 != 0) {
+                                    Log.i("BluetoothMsgErrValue", ByteUtil.byteArrayToHexStr(validData));
+                                } else {
+                                    Log.i("BluetoothMsgValidValue", ByteUtil.byteArrayToHexStr(validData));
+                                }
+                                list.add(value);
+                                if (list.size() > ECG_DATA_COUNT) {
+                                    list.remove(0);
+                                }
+                                adapter.notifyDataSetChanged();
+                                valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value));
+                                if (uploadThread.runState.get() == 0) {
+                                    uploadThread.start();
+                                }
                             }
                         }
                         break;
@@ -332,45 +336,49 @@ public class MeasureFragment extends Fragment {
         @Override
         public void run() {
             runState.set(1);
-            while (!valuePairQueue.isEmpty() && getRunState().get() == 1) {
-                List<UploadRequest.ValuePair> valuePairs = new ArrayList<>();
-                for (int i = 0; i < 60; i++) {
-                    UploadRequest.ValuePair valuePair = null;
-                    try {
-                        synchronized (valuePairQueue) {
+            synchronized (valuePairQueue) {
+                while (!valuePairQueue.isEmpty() && getRunState().get() == 1) {
+                    List<UploadRequest.ValuePair> valuePairs = new ArrayList<>();
+                    for (int i = 0; i < 60; i++) {
+                        UploadRequest.ValuePair valuePair = null;
+                        try {
                             valuePair = valuePairQueue.take();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                    } catch (InterruptedException e) {
+                        if (valuePair != null) {
+                            valuePairs.add(valuePair);
+                        }
+                    }
+                    UploadRequest request = new UploadRequest();
+                    request.setAction("upload");
+                    try {
+                        request.setAndroid_version(android.os.Build.VERSION.RELEASE);
+                        request.setDevice(android.os.Build.MODEL);
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    if (valuePair != null) {
-                        valuePairs.add(valuePair);
-                    }
+                    request.setValuePairs(valuePairs);
+                    UploadApi uploadApi = new UploadApi();
+                    uploadApi.getResponse(request, new BaseApi.Handler<UploadResponse>() {
+                        @Override
+                        public void onSuccess(UploadResponse response) {
+                            if (response != null) {
+                                Log.i("uploadAction", response.getMsg());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(UploadResponse response, int errorFlag) {
+                            if (response != null) {
+                                Log.i("uploadAction", response.getMsg());
+                            } else {
+                                Log.i("uploadAction", String.format("错误信息 %s:,上传失败", errorFlag));
+                            }
+                        }
+                    }, mActivity);
+
                 }
-                UploadRequest request = new UploadRequest();
-                request.setAction("upload");
-                request.setAndroid_version(android.os.Build.VERSION.RELEASE);
-                request.setDevice(android.os.Build.MODEL);
-                request.setValuePairs(valuePairs);
-                UploadApi uploadApi = new UploadApi();
-                uploadApi.getResponse(request, new BaseApi.Handler<UploadResponse>() {
-                    @Override
-                    public void onSuccess(UploadResponse response) {
-                        if (response != null) {
-                            Log.i("uploadAction", response.getMsg());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(UploadResponse response, int errorFlag) {
-                        if (response != null) {
-                            Log.i("uploadAction", response.getMsg());
-                        } else {
-                            Log.i("uploadAction", String.format("错误信息 %s:,上传失败", errorFlag));
-                        }
-                    }
-                }, mActivity);
-
             }
             runState.set(0);
         }
