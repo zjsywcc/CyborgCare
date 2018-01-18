@@ -6,6 +6,12 @@
     <string name="main_calender_title">数据</string>
     <string name="main_profile_title">设置</string>
 
+    <!-- measure fragment -->
+    <string name="emg_chart_title">肌&#160;电&#160;数&#160;据</string>
+    <string name="rr_chart_title">呼&#160;吸&#160;数&#160;据</string>
+    <string name="eeg_chart_title">脑&#160;电&#160;数&#160;据</string>
+    <string name="temp_chart_title">体&#160;温&#160;数&#160;据</string>
+
     <!-- profile -->
     <string name="profile_avatar_imageview">个人头像</string>
     <string name="profile_person_indicater">点此进入个人信息</string>

@@ -23,11 +23,17 @@ public class UploadRequest extends BaseRequest {
 
         private long timestamp;
 
-        private float value;
+        private float emgValue;
+        private float rrValue;
+        private float eegValue;
+        private float tempValue;
 
-        public ValuePair(long timestamp, float value) {
+        public ValuePair(long timestamp, float emgValue, float rrValue, float eegValue, float tempValue) {
             this.timestamp = timestamp;
-            this.value = value;
+            this.emgValue = emgValue;
+            this.rrValue = rrValue;
+            this.eegValue = eegValue;
+            this.tempValue = tempValue;
         }
 
         public long getTimestamp() {
@@ -38,12 +44,36 @@ public class UploadRequest extends BaseRequest {
             this.timestamp = timestamp;
         }
 
-        public float getValue() {
-            return value;
+        public float getEmgValue() {
+            return emgValue;
         }
 
-        public void setValue(float value) {
-            this.value = value;
+        public void setEmgValue(float emgValue) {
+            this.emgValue = emgValue;
+        }
+
+        public float getRrValue() {
+            return rrValue;
+        }
+
+        public void setRrValue(float rrValue) {
+            this.rrValue = rrValue;
+        }
+
+        public float getEegValue() {
+            return eegValue;
+        }
+
+        public void setEegValue(float eegValue) {
+            this.eegValue = eegValue;
+        }
+
+        public float getTempValue() {
+            return tempValue;
+        }
+
+        public void setTempValue(float tempValue) {
+            this.tempValue = tempValue;
         }
     }
 }

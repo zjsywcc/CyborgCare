@@ -45,7 +45,7 @@ public class Configurations {
     /**
      * 蓝牙帧长度
      */
-    public static final int FRAME_LENGTH = 10;
+    public static final int FRAME_LENGTH = 29;
     /**
      * shared preference的名字
      */

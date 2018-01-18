@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.moecheng.cyborgcare.Configurations;
+import com.moecheng.cyborgcare.MainActivity;
 import com.moecheng.cyborgcare.R;
 import com.moecheng.cyborgcare.bluetooth.DeviceConnector;
 import com.moecheng.cyborgcare.network.api.BaseApi;
@@ -22,6 +23,7 @@ import com.moecheng.cyborgcare.network.bean.response.UploadResponse;
 import com.moecheng.cyborgcare.profile.BluetoothControlActivity;
 import com.moecheng.cyborgcare.util.ByteUtil;
 import com.moecheng.cyborgcare.util.Log;
+import com.moecheng.cyborgcare.util.ToastUtil;
 import com.moecheng.cyborgcare.view.chart.Chart;
 import com.moecheng.cyborgcare.view.chart.ShadowLineChart;
 import com.moecheng.cyborgcare.view.chart.provider.LineChartAdapter;
@@ -53,12 +55,29 @@ public class MeasureFragment extends Fragment {
     /**
      * 测量曲线图
      */
-    @BindView(R.id.measure_chart)
-    ShadowLineChart mECGDataChart;
-    public static ArrayList<Float> mECGDataArrayList;
-    public static LineChartAdapter mECGDataAdapter;
+    @BindView(R.id.emg_chart)
+    ShadowLineChart mEMGDataChart;
+    public static ArrayList<Float> mEMGDataArrayList;
+    public static LineChartAdapter mEMGDataAdapter;
+    private static final int EMG_DATA_COUNT = 10;
 
-    private static final int ECG_DATA_COUNT = 10;
+    @BindView(R.id.rr_chart)
+    ShadowLineChart mRRDataChart;
+    public static ArrayList<Float> mRRDataArrayList;
+    public static LineChartAdapter mRRDataAdapter;
+    private static final int RR_DATA_COUNT = 10;
+
+    @BindView(R.id.eeg_chart)
+    ShadowLineChart mEEGDataChart;
+    public static ArrayList<Float> mEEGDataArrayList;
+    public static LineChartAdapter mEEGDataAdapter;
+    private static final int EEG_DATA_COUNT = 10;
+
+    @BindView(R.id.temp_chart)
+    ShadowLineChart mTEMPDataChart;
+    public static ArrayList<Float> mTEMPDataArrayList;
+    public static LineChartAdapter mTEMPDataAdapter;
+    private static final int TEMP_DATA_COUNT = 10;
 
     private DecimalFormat formatter;
     private FakeECGThread fakeECGThread;
@@ -84,16 +103,20 @@ public class MeasureFragment extends Fragment {
         return rootView;
     }
 
+
     private void initView(View view) {
-        formatter = new DecimalFormat("###.##");
-        mECGDataChart.setYAxisValuesFormatter(new Chart.YAxisValueFormatter() {
+        /**
+         * 初始化emg图表
+         */
+        mEMGDataChart.setYAxisValuesFormatter(new Chart.YAxisValueFormatter() {
             @Override
             public String yValuesString(float v) {
+                formatter = new DecimalFormat("###.##");
                 return formatter.format(v);
             }
         });
-        mECGDataArrayList = new ArrayList<>();
-        mECGDataAdapter = new SimpleChartAdapter() {
+        mEMGDataArrayList = new ArrayList<>();
+        mEMGDataAdapter = new SimpleChartAdapter() {
             @Override
             public int getLineCount() {
                 return 1;
@@ -101,7 +124,7 @@ public class MeasureFragment extends Fragment {
 
             @Override
             public ArrayList<Float> getLineData(int index) {
-                return mECGDataArrayList;
+                return mEMGDataArrayList;
             }
 
             @Override
@@ -116,7 +139,7 @@ public class MeasureFragment extends Fragment {
 
             @Override
             public int getXLabelsCount() {
-                return ECG_DATA_COUNT;
+                return EMG_DATA_COUNT;
             }
 
             @Override
@@ -124,10 +147,141 @@ public class MeasureFragment extends Fragment {
                 return position + "";
             }
         };
-        mECGDataChart.setAdapter(mECGDataAdapter);
+        mEMGDataChart.setAdapter(mEMGDataAdapter);
+        /**
+         * 初始化呼吸数据图表
+         */
+        mRRDataChart.setYAxisValuesFormatter(new Chart.YAxisValueFormatter() {
+            @Override
+            public String yValuesString(float v) {
+                formatter = new DecimalFormat("###.##");
+                return formatter.format(v);
+            }
+        });
+        mRRDataArrayList = new ArrayList<>();
+        mRRDataAdapter = new SimpleChartAdapter() {
+            @Override
+            public int getLineCount() {
+                return 1;
+            }
+
+            @Override
+            public ArrayList<Float> getLineData(int index) {
+                return mRRDataArrayList;
+            }
+
+            @Override
+            public int getLineColorId(int index) {
+                return R.color.colorPrimary;
+            }
+
+            @Override
+            public int getShadowColor(int position) {
+                return R.color.colorPrimaryLight;
+            }
+
+            @Override
+            public int getXLabelsCount() {
+                return RR_DATA_COUNT;
+            }
+
+            @Override
+            public String getXLabel(int position) {
+                return position + "";
+            }
+        };
+        mRRDataChart.setAdapter(mRRDataAdapter);
+        /**
+         * 初始化脑电数据图表
+         */
+        mEEGDataChart.setYAxisValuesFormatter(new Chart.YAxisValueFormatter() {
+            @Override
+            public String yValuesString(float v) {
+                formatter = new DecimalFormat("###.##");
+                return formatter.format(v);
+            }
+        });
+        mEEGDataArrayList = new ArrayList<>();
+        mEEGDataAdapter = new SimpleChartAdapter() {
+            @Override
+            public int getLineCount() {
+                return 1;
+            }
+
+            @Override
+            public ArrayList<Float> getLineData(int index) {
+                return mEEGDataArrayList;
+            }
+
+            @Override
+            public int getLineColorId(int index) {
+                return R.color.colorPrimary;
+            }
+
+            @Override
+            public int getShadowColor(int position) {
+                return R.color.colorPrimaryLight;
+            }
+
+            @Override
+            public int getXLabelsCount() {
+                return EEG_DATA_COUNT;
+            }
+
+            @Override
+            public String getXLabel(int position) {
+                return position + "";
+            }
+        };
+        mEEGDataChart.setAdapter(mEEGDataAdapter);
+        /**
+         * 初始化体温数据图表
+         */
+        mTEMPDataChart.setYAxisValuesFormatter(new Chart.YAxisValueFormatter() {
+            @Override
+            public String yValuesString(float v) {
+                formatter = new DecimalFormat("###.##");
+                return formatter.format(v);
+            }
+        });
+        mTEMPDataArrayList = new ArrayList<>();
+        mTEMPDataAdapter = new SimpleChartAdapter() {
+            @Override
+            public int getLineCount() {
+                return 1;
+            }
+
+            @Override
+            public ArrayList<Float> getLineData(int index) {
+                return mTEMPDataArrayList;
+            }
+
+            @Override
+            public int getLineColorId(int index) {
+                return R.color.colorPrimary;
+            }
+
+            @Override
+            public int getShadowColor(int position) {
+                return R.color.colorPrimaryLight;
+            }
+
+            @Override
+            public int getXLabelsCount() {
+                return TEMP_DATA_COUNT;
+            }
+
+            @Override
+            public String getXLabel(int position) {
+                return position + "";
+            }
+        };
+        mTEMPDataChart.setAdapter(mTEMPDataAdapter);
+
         if (mHandler == null && BluetoothControlActivity.getInstance() != null)
-            mHandler = new BluetoothResponseHandler(mECGDataArrayList, mECGDataAdapter, valuePairQueue, uploadThread, BluetoothControlActivity.getInstance());
-//        fakeECGThread = new FakeECGThread(mECGDataArrayList, mECGDataAdapter);
+//            mHandler = new BluetoothResponseHandler(mEMGDataArrayList, mEMGDataAdapter, valuePairQueue, uploadThread, BluetoothControlActivity.getInstance());
+            mHandler = new BluetoothResponseHandler(BluetoothControlActivity.getInstance());
+//        fakeECGThread = new FakeECGThread(mEMGDataArrayList, mEMGDataAdapter);
 //        fakeECGThread.start();
     }
 
@@ -160,8 +314,8 @@ public class MeasureFragment extends Fragment {
                 try {
                     float value = getRandomECG();
                     list.add(value);
-                    valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value));
-                    if (list.size() > ECG_DATA_COUNT) {
+                    valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value, 0, 0, 0));
+                    if (list.size() > EMG_DATA_COUNT) {
                         list.remove(0);
                     }
                     adapter.notifyDataSetChanged();
@@ -206,17 +360,15 @@ public class MeasureFragment extends Fragment {
             mActivity = new WeakReference<BluetoothControlActivity>(target);
         }
 
-        private List<Float> list;
-        private LineChartAdapter adapter;
-        private LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs;
-        private UploadThread uploadThread;
+//        private List<Float> list;
+//        private LineChartAdapter adapter;
+//        private LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs;
 
-        public BluetoothResponseHandler(List<Float> list, LineChartAdapter adapter, LinkedBlockingDeque<UploadRequest.ValuePair> valuePairs, UploadThread uploadThread
-                , BluetoothControlActivity activity) {
-            this.list = list;
-            this.adapter = adapter;
-            this.valuePairs = valuePairs;
-            this.uploadThread = uploadThread;
+        public BluetoothResponseHandler(BluetoothControlActivity activity) {
+//            this.list = list;
+//            this.adapter = adapter;
+//            this.valuePairs = valuePairs;
+//            this.uploadThread = uploadThread;
             this.mActivity = new WeakReference<BluetoothControlActivity>(activity);
         }
 
@@ -252,10 +404,12 @@ public class MeasureFragment extends Fragment {
                             //   Log.i("tag", "缓冲区大小" + buffer.readableBytes() + "");
                             byte[] validData = new byte[Configurations.FRAME_LENGTH];
                             //重新组帧
+                            int errLoop = 0;
                             while (buffer.readableBytes() > Configurations.FRAME_LENGTH) {     //判断缓冲区大小大于一帧长度，就可以进行解帧
                                 ByteBuf bufTemp = buffer.readBytes(1);    //先取第一个字节，判断是不是帧头的第一个字节0xFF
                                 byte[] bytesTemp = new byte[1];
                                 bufTemp.readBytes(bytesTemp);
+                                Log.i("printHexEEG", ByteUtil.byteArrayToHexStr(readBytes));
                                 //判断第一个字节是不是0xFF，如果不是，直接丢弃，如果是，则进入if判断
                                 if (bytesTemp[0] == (byte) 0xFF) {
                                     buffer.markReaderIndex();
@@ -280,27 +434,92 @@ public class MeasureFragment extends Fragment {
                                     break;
                                 } else {       //第一个字节不是0xff情况
                                     buffer.resetReaderIndex();   //指针回滚，回滚到只是取出第一个数
-                                    continue;
+                                    errLoop++;
+                                    if(errLoop > 50) {
+                                        Log.i("PACKET_ERROR", "packet has wrong header");
+                                        ToastUtil.showToast(MainActivity.getInstance(), "包头错误");
+                                        break;
+                                    }
                                 }
                             }
                             if (validData[0] != 0x00) {
-                                float value = validData[1] & 0xFF;
-                                Log.i("bluetoothMsg", value + "");
-                                if (value % 16 != 0) {
+                                /**
+                                 * 取出下标为1的肌电信号的值
+                                 */
+                                float emgValue = validData[1] & 0xFF;
+//                                value = value + (float) Math.random() * 10;
+                                Log.i("bluetoothMsg", emgValue + "");
+                                if (emgValue % 16 != 0) {
                                     Log.i("BluetoothMsgErrValue", ByteUtil.byteArrayToHexStr(validData));
                                 } else {
                                     Log.i("BluetoothMsgValidValue", ByteUtil.byteArrayToHexStr(validData));
                                 }
-                                list.add(value);
-                                if (list.size() > ECG_DATA_COUNT) {
-                                    list.remove(0);
+                                mEMGDataArrayList.add(emgValue);
+                                if (mEMGDataArrayList.size() > EMG_DATA_COUNT) {
+                                    mEMGDataArrayList.remove(0);
                                 }
-                                adapter.notifyDataSetChanged();
-                                valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), value));
+                                mEMGDataAdapter.notifyDataSetChanged();
+
+
+                                /**
+                                 * 取出下标为5的呼吸信号的值
+                                 */
+                                float rrValue = validData[1] & 0xFF;
+//                                value = value + (float) Math.random() * 10;
+                                Log.i("bluetoothMsg", rrValue + "");
+                                if (rrValue % 16 != 0) {
+                                    Log.i("BluetoothMsgErrValue", ByteUtil.byteArrayToHexStr(validData));
+                                } else {
+                                    Log.i("BluetoothMsgValidValue", ByteUtil.byteArrayToHexStr(validData));
+                                }
+                                mRRDataArrayList.add(rrValue);
+                                if (mRRDataArrayList.size() > RR_DATA_COUNT) {
+                                    mRRDataArrayList.remove(0);
+                                }
+                                mRRDataAdapter.notifyDataSetChanged();
+
+                                /**
+                                 * 取出下标为x的脑电信号的值
+                                 */
+                                float eegValue = validData[1] & 0xFF;
+//                                value = value + (float) Math.random() * 10;
+                                Log.i("bluetoothMsg", eegValue + "");
+                                if (eegValue % 16 != 0) {
+                                    Log.i("BluetoothMsgErrValue", ByteUtil.byteArrayToHexStr(validData));
+                                } else {
+                                    Log.i("BluetoothMsgValidValue", ByteUtil.byteArrayToHexStr(validData));
+                                }
+                                mEEGDataArrayList.add(rrValue);
+                                if (mEEGDataArrayList.size() > EEG_DATA_COUNT) {
+                                    mEEGDataArrayList.remove(0);
+                                }
+                                mEEGDataAdapter.notifyDataSetChanged();
+
+                                /**
+                                 * 取出下标为x的体温的值
+                                 */
+                                float tempValue = validData[1] & 0xFF;
+//                                value = value + (float) Math.random() * 10;
+                                Log.i("bluetoothMsg", tempValue + "");
+                                if (tempValue % 16 != 0) {
+                                    Log.i("BluetoothMsgErrValue", ByteUtil.byteArrayToHexStr(validData));
+                                } else {
+                                    Log.i("BluetoothMsgValidValue", ByteUtil.byteArrayToHexStr(validData));
+                                }
+                                mTEMPDataArrayList.add(rrValue);
+                                if (mTEMPDataArrayList.size() > TEMP_DATA_COUNT) {
+                                    mTEMPDataArrayList.remove(0);
+                                }
+                                mTEMPDataAdapter.notifyDataSetChanged();
+
+
+
+                                valuePairQueue.add(new UploadRequest.ValuePair(new Date().getTime(), emgValue, rrValue, eegValue, tempValue));
                                 if (uploadThread.runState.get() == 0) {
                                     uploadThread.start();
                                 }
                             }
+
                         }
                         break;
                     case MESSAGE_DEVICE_NAME:

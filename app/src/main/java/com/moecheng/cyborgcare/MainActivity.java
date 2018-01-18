@@ -18,10 +18,16 @@ public class MainActivity extends BaseActivity {
 
     private TabViewController tabViewController;
 
+    private static MainActivity mActivity;
+
+    public static MainActivity getInstance() {
+        return mActivity;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mActivity = this;
     }
 
 

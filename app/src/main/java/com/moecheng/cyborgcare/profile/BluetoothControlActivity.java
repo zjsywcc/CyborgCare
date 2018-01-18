@@ -153,7 +153,8 @@ public class BluetoothControlActivity extends BaseActivity {
 //        else mHandler.setTarget(this);
 
         if (mHandler == null)
-            mHandler = new MeasureFragment.BluetoothResponseHandler(MeasureFragment.mECGDataArrayList, MeasureFragment.mECGDataAdapter, MeasureFragment.valuePairQueue, MeasureFragment.uploadThread, this);
+//            mHandler = new MeasureFragment.BluetoothResponseHandler(MeasureFragment.mECGDataArrayList, MeasureFragment.mECGDataAdapter, MeasureFragment.valuePairQueue, MeasureFragment.uploadThread, this);
+            mHandler = new MeasureFragment.BluetoothResponseHandler(this);
         else
             mHandler.setTarget(this);
 
