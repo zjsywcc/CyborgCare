@@ -9,7 +9,16 @@
     <!-- measure fragment -->
     <string name="emg_chart_title">肌&#160;电&#160;数&#160;据</string>
     <string name="rr_chart_title">呼&#160;吸&#160;数&#160;据</string>
-    <string name="eeg_chart_title">脑&#160;电&#160;数&#160;据</string>
+    <string name="eeg_delta_chart_title">脑&#160;电&#160;Delta&#160;波&#160;形</string>
+    <string name="eeg_theta_chart_title">脑&#160;电&#160;Theta&#160;波&#160;形</string>
+    <string name="eeg_lowalpha_chart_title">脑&#160;电&#160;Lowalpha&#160;波&#160;形</string>
+    <string name="eeg_highalpha_chart_title">脑&#160;电&#160;Highalpha&#160;波&#160;形</string>
+    <string name="eeg_lowbeta_chart_title">脑&#160;电&#160;Lowbeta&#160;波&#160;形</string>
+    <string name="eeg_highbeta_chart_title">脑&#160;电&#160;Highbeta&#160;波&#160;形</string>
+    <string name="eeg_lowgamma_chart_title">脑&#160;电&#160;Lowgamma&#160;波&#160;形</string>
+    <string name="eeg_midgamma_chart_title">脑&#160;电&#160;Midgamma&#160;波&#160;形</string>
+    <string name="eeg_attention_chart_title">脑&#160;电&#160;专&#160;注&#160;度</string>
+    <string name="eeg_mediation_chart_title">脑&#160;电&#160;冥&#160;想&#160;度</string>
     <string name="temp_chart_title">体&#160;温&#160;数&#160;据</string>
 
     <!-- profile -->

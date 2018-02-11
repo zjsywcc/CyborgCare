@@ -16,6 +16,7 @@ import com.moecheng.cyborgcare.util.Compat;
 import com.moecheng.cyborgcare.view.chart.provider.ChartAdapter;
 import com.moecheng.cyborgcare.view.chart.theme.ChartTheme;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 /**
@@ -815,6 +816,21 @@ public abstract class Chart extends View {
      */
     public interface YAxisValueFormatter {
         String yValuesString(float v);
+    }
+
+    public class YAxisValueDecimalFormatterImpl implements YAxisValueFormatter {
+
+        private DecimalFormat formatter;
+
+        public YAxisValueDecimalFormatterImpl(DecimalFormat formatter) {
+            this.formatter = formatter;
+        }
+
+        @Override
+        public String yValuesString(float v) {
+            return formatter.format(v);
+        }
+
     }
 
 

@@ -24,7 +24,7 @@ public class Configurations {
     /**
      * 网络请求基址
      */
-    public static final String REQUEST_URL = "http://192.168.198.243:8080";
+    public static final String REQUEST_URL = "http://192.168.198.244:8080";
     public static final String USER_URL = "/appuser";
     public static final String UPLOAD_URL = "/bluetooth";
     public static final String INFO_URL = "";
@@ -45,7 +45,7 @@ public class Configurations {
     /**
      * 蓝牙帧长度
      */
-    public static final int FRAME_LENGTH = 29;
+    public static final int FRAME_LENGTH = 42;
     /**
      * shared preference的名字
      */

@@ -70,15 +70,223 @@
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:text="@string/eeg_chart_title"
+                android:text="@string/eeg_delta_chart_title"
                 android:textSize="@dimen/textSize_second_title" />
 
             <com.moecheng.cyborgcare.view.chart.ShadowLineChart
-                android:id="@+id/eeg_chart"
+                android:id="@+id/eeg_delta_chart"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/measure_chart_height" />
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@string/eeg_theta_chart_title"
+                android:textSize="@dimen/textSize_second_title" />
+
+            <com.moecheng.cyborgcare.view.chart.ShadowLineChart
+                android:id="@+id/eeg_theta_chart"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/measure_chart_height" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@string/eeg_lowalpha_chart_title"
+                android:textSize="@dimen/textSize_second_title" />
+
+            <com.moecheng.cyborgcare.view.chart.ShadowLineChart
+                android:id="@+id/eeg_lowalpha_chart"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/measure_chart_height" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@string/eeg_highalpha_chart_title"
+                android:textSize="@dimen/textSize_second_title" />
+
+            <com.moecheng.cyborgcare.view.chart.ShadowLineChart
+                android:id="@+id/eeg_highalpha_chart"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/measure_chart_height" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@string/eeg_lowbeta_chart_title"
+                android:textSize="@dimen/textSize_second_title" />
+
+            <com.moecheng.cyborgcare.view.chart.ShadowLineChart
+                android:id="@+id/eeg_lowbeta_chart"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/measure_chart_height" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@string/eeg_highbeta_chart_title"
+                android:textSize="@dimen/textSize_second_title" />
+
+            <com.moecheng.cyborgcare.view.chart.ShadowLineChart
+                android:id="@+id/eeg_highbeta_chart"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/measure_chart_height" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@string/eeg_lowgamma_chart_title"
+                android:textSize="@dimen/textSize_second_title" />
+
+            <com.moecheng.cyborgcare.view.chart.ShadowLineChart
+                android:id="@+id/eeg_lowgamma_chart"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/measure_chart_height" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@string/eeg_midgamma_chart_title"
+                android:textSize="@dimen/textSize_second_title" />
+
+            <com.moecheng.cyborgcare.view.chart.ShadowLineChart
+                android:id="@+id/eeg_midgamma_chart"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/measure_chart_height" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@string/eeg_attention_chart_title"
+                android:textSize="@dimen/textSize_second_title" />
+
+            <com.moecheng.cyborgcare.view.chart.ShadowLineChart
+                android:id="@+id/eeg_attention_chart"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/measure_chart_height" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="@string/eeg_mediation_chart_title"
+                android:textSize="@dimen/textSize_second_title" />
+
+            <com.moecheng.cyborgcare.view.chart.ShadowLineChart
+                android:id="@+id/eeg_mediation_chart"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/measure_chart_height" />
+
+        </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
